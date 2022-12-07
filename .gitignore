@@ -1,0 +1,15 @@
+# git ignore les fichiers suivants
+**/secrets.h
+
+# Ignore Logs
+**/*.log
+
+# Ignore doc
+**/*.doc
+
+# Ignore 3d
+**/*.fcstd
+**/*.fcstd1
+**/*.idea
+**/*.gcode
+
