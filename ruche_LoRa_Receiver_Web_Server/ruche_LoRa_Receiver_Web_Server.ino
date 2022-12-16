@@ -15,11 +15,6 @@
 
 ********************************************************************************************/
 
-//==============================================
-// Debug
-//==============================================
-//bool debug = true; //Display log message if True
-
 //=============================================================================================
 // inclusion des bibliothèques
 //=============================================================================================
@@ -88,8 +83,8 @@ Dusk2Dawn dognon(SECRET_LATITUDE, SECRET_LONGITUDE, 1);  // 1 pour +1 utc !!!
 /*  Available methods are sunrise() and sunset(). Arguments are year, month,
     day, and if Daylight (heure d'ete) Saving Time is in effect.
 */
-int doSunrise  = 0 ; // dognon.sunrise(2022, 12, 25, false);
-int doSunset   = 0 ; // dognon.sunset(2022, 12, 25, false);
+int doSunrise  = 0 ;
+int doSunset   = 0 ;
 
 //===============================================================
 // brochage de l'emetteur/recepteur lora en fonction de la carte
@@ -598,6 +593,13 @@ void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey)
   }
 }
 
+//====================
+// page web not found
+//====================
+void notFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
+}
+
 //=======
 // setup:
 //=======
@@ -679,11 +681,6 @@ void setup() {
     request->send(SPIFFS, "/winter.jpg", "image/jpg");
   });
 
-  // Start server
-  if (SECRET_WIFI_TRUE) {
-    server.begin();
-  }
-
   // Init and get the time
   //configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
@@ -696,7 +693,6 @@ void setup() {
   //setenv("TZ", "GMT+0BST-1,M3.5.0/01:00:00,M10.5.0/02:00:00", 1);
 
   printLocalTime();
-
   //Sunset and sunrise
   SunsetSunrise();
 
@@ -704,6 +700,12 @@ void setup() {
 #if MQTT
   clientMqtt.setServer(mqttServer, mqttPort);   // On défini la connexion MQTT
 #endif
+
+  // Start server
+  if (SECRET_WIFI_TRUE) {
+    server.onNotFound(notFound);
+    server.begin();
+  }
 }
 
 //=======
@@ -737,24 +739,24 @@ void loop() {
         if (JLM) {
           if (Ruche.numRuche == "1") {
             // envoi du poids
-            SendData(idxDeviceRuche1Poids, "Ruche1_poids", Ruche.poids.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche1Poids, "Ruche1_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
             SendData(idxDeviceRuche1Temperature, "Ruche1_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la baterrie
             SendData(idxDeviceRuches1TensionBatterie, "Ruche1_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "2") {
             // envoi du poids
-            SendData(idxDeviceRuche2Poids, "Ruche2_poids", Ruche.poids.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche2Poids, "Ruche2_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
             SendData(idxDeviceRuche2Temperature, "Ruche2_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la baterrie
             SendData(idxDeviceRuches2TensionBatterie, "Ruche2_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "3") {
             // envoi du poids
-            //SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des données via JSON et MQTT
+            //SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
             //SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
-            // envoi de la tension de la baterrie
+            // envoi de la tension de la batterie
             //SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           }
         }
@@ -854,17 +856,18 @@ void setup_wifi() {
 void connect_wifi() {
   //if the connection to the stongest hotstop is lost, it will connect to the next network on the list
   if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+    adresse_ip = WiFi.localIP().toString();
 #if SerialMonitor
     Serial.print("WiFi connected loop ");
     Serial.print(WiFi.SSID());
     Serial.print(" ");
     Serial.println(WiFi.RSSI());
     Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println(adresse_ip);
     display.setCursor(0, 10);
     display.print("IP Adr: ");
     display.setCursor(40, 10);
-    display.print(WiFi.localIP());
+    display.print(adresse_ip);
     display.display();
     delay(100);
 #endif
@@ -912,11 +915,11 @@ void reconnect() {
 
     // Tentative de connexion
     if (clientMqtt.connect(clientId.c_str(), mqttUser, mqttPassword)) {
-      Serial.println("connecté");
+      Serial.println("connecte");
 
-      // Connexion effectuée, publication d'un message...
-      String message = "Connexion MQTT de " + nomModule + " réussi sous référence technique : " + clientId + ".";
-      // String message = "Connexion MQTT de "+ nomModule + " réussi.";
+      // Connexion effectuee, publication d'un message...
+      String message = "Connexion MQTT de " + nomModule + " reussi sous reference technique : " + clientId + ".";
+      // String message = "Connexion MQTT de "+ nomModule + " reussi.";
       StaticJsonBuffer<256> jsonBuffer;
       // Parse l'objet root
       JsonObject &root = jsonBuffer.createObject();
@@ -927,14 +930,14 @@ void reconnect() {
       // On sérialise la variable JSON
       String messageOut;
       if (root.printTo(messageOut) == 0) {
-        Serial.println("Erreur lors de la création du message de connexion pour Domoticz");
+        Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
       } else  {
         // Convertion du message en Char pour envoi dans les Log Domoticz.
         char messageChar[messageOut.length() + 1];
         messageOut.toCharArray(messageChar, messageOut.length() + 1);
         clientMqtt.publish(topicOut, messageChar);
       }
-      // On souscrit (écoute)
+      // On souscrit (ecoute)
       clientMqtt.subscribe("#");
     } else {
       Serial.print("Erreur, rc=");
@@ -952,7 +955,7 @@ void SendData (int idxDevice, String description, const char* chaine) {
   // Parse l'objet root
   JsonObject &root = jsonBuffer.createObject();
   // On renseigne les variables.
-  root["ip"] = adresse_ip;
+  root["ip"]      = adresse_ip;
   root["descrip"] = nomModule;
   root["type"]    = "command";
   root["param"]   = "udevice";
@@ -962,7 +965,7 @@ void SendData (int idxDevice, String description, const char* chaine) {
   // On sérialise la variable JSON
   String messageOut;
   if (root.printTo(messageOut) == 0) {
-    Serial.println("Erreur lors de la création du message de connexion pour Domoticz");
+    Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
   } else  {
     // Convertion du message en Char pour envoi dans les Log Domoticz.
     char messageChar[messageOut.length() + 1];
