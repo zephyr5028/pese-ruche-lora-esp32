@@ -928,16 +928,13 @@ void reconnect() {
       // Connexion effectuee, publication d'un message...
       String message = "Connexion MQTT de " + nomModule + " reussi sous reference technique : " + clientId + ".";
       // String message = "Connexion MQTT de "+ nomModule + " reussi.";
-      StaticJsonBuffer<256> jsonBuffer;
-      // Parse l'objet root
-      JsonObject &root = jsonBuffer.createObject();
+      StaticJsonDocument<256> doc; // v6
       // On renseigne les variables.
-      root["command"] = "addlogmessage";
-      root["message"] = message;
-
-      // On sérialise la variable JSON
+      doc["command"] = "addlogmessage";
+      doc["message"] = message;
+      // On serialise la variable JSON
       String messageOut;
-      if (root.printTo(messageOut) == 0) {
+      if (serializeJson(doc,messageOut) == 0) {
         Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
       } else  {
         // Convertion du message en Char pour envoi dans les Log Domoticz.
@@ -958,21 +955,19 @@ void reconnect() {
 
 // envoi des donnes avec l'idx de domoticz en fonction des sondes
 void SendData (int idxDevice, String description, const char* chaine) {
-  // Création et Envoi de la donnée JSON.
-  StaticJsonBuffer<256> jsonBuffer;
-  // Parse l'objet root
-  JsonObject &root = jsonBuffer.createObject();
+  // Creation et Envoi de la donnee JSON.
+  StaticJsonDocument<256> doc; // v6
   // On renseigne les variables.
-  root["ip"]      = adresse_ip;
-  root["descrip"] = nomModule;
-  root["type"]    = "command";
-  root["param"]   = "udevice";
-  root["idx"]     = idxDevice;
-  root["nvalue"]  = 0;
-  root["svalue"]  = chaine;
-  // On sérialise la variable JSON
+  doc["ip"]      = adresse_ip;
+  doc["descrip"] = nomModule;
+  doc["type"]    = "command";
+  doc["param"]   = "udevice";
+  doc["idx"]     = idxDevice;
+  doc["nvalue"]  = 0;
+  doc["svalue"]  = chaine;
+  // On serialise la variable JSON
   String messageOut;
-  if (root.printTo(messageOut) == 0) {
+  if (serializeJson(doc, messageOut) == 0) {
     Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
   } else  {
     // Convertion du message en Char pour envoi dans les Log Domoticz.
