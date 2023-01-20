@@ -30,6 +30,9 @@ IPAddress dns(xxx, xxx, xxx, xxx);      // dns
 #define SECRET_SSID2 "xxxxxxxxxx"    // replace MySSID with your WiFi network name
 #define SECRET_PASS2 "xxxxxxxxxx"    // replace MyPassword with your WiFi password
 
+// noms sur le reseau avec mDNS
+#define NAME_RESEAU "xxxxxxxxxxxxx"
+
 //======================
 //Thinkspeak connection
 //======================
@@ -87,4 +90,3 @@ const int idxDeviceRuches2TensionBatterie = 000;  // idx du device de la tension
 #define SECRET_LATITUDE 00.000        // 
 #define SECRET_LONGITUDE 0.000        // 
 #endif
-

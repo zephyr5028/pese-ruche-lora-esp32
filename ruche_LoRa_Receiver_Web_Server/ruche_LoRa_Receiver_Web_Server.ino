@@ -21,6 +21,7 @@
 // Wi-Fi library
 #include <WiFi.h>
 #include <WiFiMulti.h>
+#include "ESPmDNS.h"
 #include "ESPAsyncWebServer.h"
 #include "ThingSpeak.h"
 #include "secrets.h" // fichier codes
@@ -614,12 +615,19 @@ void setup() {
   // connection wifi
   if (SECRET_WIFI_TRUE) {
     setup_wifi();
+    // utilisation de mDNS pour ne plus utiliser l'adresse ip changeante a cause du multiwifi
+    if (MDNS.begin(NAME_RESEAU)) {
+      MDNS.addService("http", "tcp", 80);
+      Serial.print("mDNS advertising started : ");
+      Serial.println(NAME_RESEAU);
+    } else {
+      Serial.println("Error starting mDNS");
+    }
   }
 
   if (SECRET_THINGSPEAK_TRUE and SECRET_WIFI_TRUE) {
     ThingSpeak.begin(client);  // Initialize ThingSpeak
   }
-
 
   if (!SPIFFS.begin()) {
     Serial.println("An Error has occurred while mounting SPIFFS");
