@@ -761,11 +761,11 @@ void loop() {
             SendData(idxDeviceRuches2TensionBatterie, "Ruche2_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "3") {
             // envoi du poids
-            //SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
+            SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
-            //SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la batterie
-            //SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           }
         }
       }

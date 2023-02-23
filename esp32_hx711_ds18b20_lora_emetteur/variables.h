@@ -14,7 +14,8 @@
 //Numero Ruche
 //=============
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
-#define RUCHE_NUMERO  02      // numero de la ruche jlm2
+//#define RUCHE_NUMERO  02      // numero de la ruche jlm2
+#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 
@@ -32,6 +33,10 @@ float calibration_factor = -20332;       // calibration factor avec valeur connu
 // offset pour ruche jlm2 rfm95
 float calibration_factor = -20200;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
 
+#elif RUCHE_NUMERO == 03
+// offset pour ruche jlm2 rfm95
+float calibration_factor = -20200;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+
 #elif RUCHE_NUMERO == 11
 // offset pour ruche loic1 rfm95
 float calibration_factor = -20100;       // calibration factor avec valeur connue et tare a 0  -20100
@@ -46,6 +51,10 @@ float calibration_factor = -20332;       // calibration factor avec valeur connu
 const long LOADCELL_OFFSET = -104200;    // -104200
 
 #elif RUCHE_NUMERO == 02
+// offset pour ruche jlm2 rfm95
+const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
+
+#elif RUCHE_NUMERO == 03
 // offset pour ruche jlm2 rfm95
 const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
 
@@ -78,6 +87,9 @@ byte synchroLora = 0xF3;
 #elif RUCHE_NUMERO == 02
 #define TIME_TO_SLEEP   241    // Time ESP32 will go to sleep (in seconds)
 
+#elif RUCHE_NUMERO == 03
+#define TIME_TO_SLEEP   127    // Time ESP32 will go to sleep (in seconds)
+
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
 
@@ -106,6 +118,9 @@ const int tensionAberrante = 3; //test de le tension aberrante pour relancer une
 float correction = 0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 02
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 03
 float correction = -0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
