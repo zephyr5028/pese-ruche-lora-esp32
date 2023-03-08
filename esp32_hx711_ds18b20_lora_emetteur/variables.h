@@ -15,9 +15,16 @@
 //=============
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
-#define RUCHE_NUMERO  03      // numero de la ruche jlm3
+//#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
+//#define RUCHE_NUMERO  13      // numero de la ruche loic3
+#define RUCHE_NUMERO  14      // numero de la ruche loic4
+//#define RUCHE_NUMERO  15      // numero de la ruche loic5
+//#define RUCHE_NUMERO  16      // numero de la ruche loic6
+//#define RUCHE_NUMERO  17      // numero de la ruche loic7
+//#define RUCHE_NUMERO  18      // numero de la ruche loic8
+//#define RUCHE_NUMERO  19      // numero de la ruche loic9
 
 //=====================
 //Load Cell with HX711
@@ -43,7 +50,35 @@ float calibration_factor = -20100;       // calibration factor avec valeur connu
 
 #elif RUCHE_NUMERO == 12
 // offset pour ruche loic2 rfm95
-float calibration_factor = -20332;       // calibration factor avec valeur connue et tare a 0
+float calibration_factor = -22100;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 13
+// offset pour ruche loic3 rfm95
+float calibration_factor = -20800;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 14
+// offset pour ruche loic4 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 15
+// offset pour ruche loic5 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 16
+// offset pour ruche loic6 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 17
+// offset pour ruche loic7 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 18
+// offset pour ruche loic8 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+
+#elif RUCHE_NUMERO == 19
+// offset pour ruche loic9 rfm95
+float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
 #endif
 
 #if RUCHE_NUMERO == 01
@@ -64,7 +99,35 @@ const long LOADCELL_OFFSET = -22680;      // -22680
 
 #elif RUCHE_NUMERO == 12
 // offset pour ruche loic2 rfm95
-const long LOADCELL_OFFSET = -104300;
+const long LOADCELL_OFFSET = -125750;     // -125750
+
+#elif RUCHE_NUMERO == 13
+// offset pour ruche loic3 rfm95
+const long LOADCELL_OFFSET = -82700;      // -82700
+
+#elif RUCHE_NUMERO == 14
+// offset pour ruche loic4 rfm95
+const long LOADCELL_OFFSET = -95850;      // -95650
+
+#elif RUCHE_NUMERO == 15
+// offset pour ruche loic5 rfm95
+const long LOADCELL_OFFSET = -95850;
+
+#elif RUCHE_NUMERO == 16
+// offset pour ruche loic6 rfm95
+const long LOADCELL_OFFSET = -95850;
+
+#elif RUCHE_NUMERO == 17
+// offset pour ruche loic7 rfm95
+const long LOADCELL_OFFSET = -95850;
+
+#elif RUCHE_NUMERO == 18
+// offset pour ruche loic8 rfm95
+const long LOADCELL_OFFSET = -95850;
+
+#elif RUCHE_NUMERO == 19
+// offset pour ruche loic9 rfm95
+const long LOADCELL_OFFSET = -95850;
 #endif
 
 //const long LOADCELL_OFFSET = -102960;  // offset pour ruche 1 jlm sx1276 ttgo
@@ -80,7 +143,8 @@ byte synchroLora = 0xF3;
 //==============
 //Time to Sleep
 //==============
-// nombres premiers 41, 61 , 127, 181, 241, 307, 313, 331, 601, 613, 631, 907
+// nombres premiers 41, 61 , 127, 181, 241, 307, 313, 331, 601, 607, 613, 617, 619, 631, 907
+// nombres premiers 577, 587, 593, 599, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701
 #if RUCHE_NUMERO == 01
 #define TIME_TO_SLEEP  181     // Time ESP32 will go to sleep (in seconds)
 
@@ -95,7 +159,29 @@ byte synchroLora = 0xF3;
 
 #elif RUCHE_NUMERO == 12
 #define TIME_TO_SLEEP   613    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 13
+#define TIME_TO_SLEEP   631    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 14
+#define TIME_TO_SLEEP   641    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 15
+#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 16
+#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 17
+#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 18
+#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 19
+#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
 #endif
+
 
 //====================
 // Temperature ds18b20
@@ -127,5 +213,26 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 12
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 13
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 14
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 15
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 16
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 17
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 18
+float correction = -0.35 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 19
 float correction = -0.35 ; // correction erreurs des resistances
 #endif

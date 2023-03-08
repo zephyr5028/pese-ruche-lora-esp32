@@ -10,7 +10,7 @@ bool calibration = 0; // 1 = reglage calibration et 0 = reglage offset
 //float calibration_factor = -20332; // for me this value works just perfect 419640
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
-float calibration_factor = -20200; 
+float calibration_factor = -20500; 
 
 long LOADCELL_OFFSET;
 
@@ -24,9 +24,9 @@ void setup() {
   if (calibration) {
     LOADCELL_OFFSET = 0;
   } else {
-    LOADCELL_OFFSET = -38308; // 2eme : enlever tare au demarrage puis regler offset
+    LOADCELL_OFFSET = -92850; // 2eme : enlever tare au demarrage puis regler offset
   }
-  Serial.begin(9600);
+  Serial.begin(115200);
   scale.begin(DOUT, CLK);
   Serial.println("");
   Serial.println("HX711 calibration sketch");
@@ -34,6 +34,7 @@ void setup() {
   Serial.println("After readings begin, place known weight on scale");
   Serial.println("Press + or a to increase calibration factor or offset");
   Serial.println("Press - or z to decrease calibration factor or offset");
+  
   scale.set_scale();
   scale.set_offset(LOADCELL_OFFSET);
   // enlever pour le reglage de l'offset
