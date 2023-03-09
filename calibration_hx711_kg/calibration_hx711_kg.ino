@@ -10,7 +10,7 @@ bool calibration = 0; // 1 = reglage calibration et 0 = reglage offset
 //float calibration_factor = -20332; // for me this value works just perfect 419640
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
-float calibration_factor = -20500; 
+float calibration_factor = -22900; 
 
 long LOADCELL_OFFSET;
 
@@ -24,7 +24,7 @@ void setup() {
   if (calibration) {
     LOADCELL_OFFSET = 0;
   } else {
-    LOADCELL_OFFSET = -92850; // 2eme : enlever tare au demarrage puis regler offset
+    LOADCELL_OFFSET = -80000; // 2eme : enlever tare au demarrage puis regler offset
   }
   Serial.begin(115200);
   scale.begin(DOUT, CLK);

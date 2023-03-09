@@ -522,11 +522,11 @@ void thinkspeak() {
     int num_ruche = Ruche.numRuche.toInt(); // string to int
 
     if (JLM and num_ruche >= 1 and num_ruche <= 4) {
-      field_thinkspeak("1", "2", "3", "4");  // numeros ruhes de 1 a 4
+      field_thinkspeak("1", "2", "3", "4", "5", "6", "7", "8", "9");  // numeros ruhes de 1 a 4
       write_thingspeak (myChannelNumberJlm, myWriteAPIKeyJlm);
 
     } else if (LOIC and num_ruche >= 11 and num_ruche <= 14) {
-      field_thinkspeak("11", "12", "13", "14"); // Numeros ruches de 11 a 14
+      field_thinkspeak("11", "12", "13", "14", "15", "16", "17", "18", "19"); // Numeros ruches de 11 a 14
       write_thingspeak (myChannelNumberLoic, myWriteAPIKeyLoic);
     }
   }
@@ -550,30 +550,61 @@ void thinkspeak() {
 */
 
 // correlation numero ruche et field
-void field_thinkspeak (String r1, String r2, String r3, String r4) {
-  //Serial.println(r1);
+void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, String r6, String r7, String r8, String r9) {
+#if JLM
   if (Ruche.numRuche == r1) {
     ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(2, Ruche.tempe);  // temperature de la ruche
-#if JLM
     ThingSpeak.setField(7, Ruche.vBat);   // tension de la batterie
-#endif
   } else if (Ruche.numRuche == r2) {
     ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(4, Ruche.tempe);  // temperature de la ruche
-#if JLM
     ThingSpeak.setField(8, Ruche.vBat);   // tension de la batterie
-#endif
   } else if (Ruche.numRuche == r3) {
     ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(6, Ruche.tempe);  // temperature de la ruche
   } else if (Ruche.numRuche == r4) {
+
+  } else if (Ruche.numRuche == r5) {
+    
+  } else if (Ruche.numRuche == r6) {
+    
+  } else if (Ruche.numRuche == r7) {
+    
+  } else if (Ruche.numRuche == r8) {
+    
+  } else if (Ruche.numRuche == r9) {
+    
+  }
+#endif
+
 #if LOIC
+  if (Ruche.numRuche == r1) {
+    ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(2, Ruche.tempe);  // temperature de la ruche
+  } else if (Ruche.numRuche == r2) {
+    ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(4, Ruche.tempe);  // temperature de la ruche
+  } else if (Ruche.numRuche == r3) {
+    ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(6, Ruche.tempe);  // temperature de la ruche
+  } else if (Ruche.numRuche == r4) {
     ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(8, Ruche.tempe);  // temperature de la ruche
-#endif
+  } else if (Ruche.numRuche == r5) {
+    
+  } else if (Ruche.numRuche == r6) {
+    
+  } else if (Ruche.numRuche == r7) {
+    
+  } else if (Ruche.numRuche == r8) {
+    
+  } else if (Ruche.numRuche == r9) {
+    
   }
+#endif
 }
+
 // envoi des donnees vers thingspeak
 void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey) {
   // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
@@ -597,7 +628,7 @@ void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey)
 //====================
 // page web not found
 //====================
-void notFound(AsyncWebServerRequest *request) {
+void notFound(AsyncWebServerRequest * request) {
   request->send(404, "text/plain", "Not found");
 }
 
@@ -934,7 +965,7 @@ void reconnect() {
       doc["message"] = message;
       // On serialise la variable JSON
       String messageOut;
-      if (serializeJson(doc,messageOut) == 0) {
+      if (serializeJson(doc, messageOut) == 0) {
         Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
       } else  {
         // Convertion du message en Char pour envoi dans les Log Domoticz.
