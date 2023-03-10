@@ -225,7 +225,7 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 16
-float correction = -0.35 ; // correction erreurs des resistances
+float correction = -0.25 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 17
 float correction = -0.45 ; // correction erreurs des resistances
