@@ -469,11 +469,20 @@ void getReadings() {
     if (temporaire == 't') scale.tare();    //Reset the scale to zero
   }
 }
+
+//=======================
+// tension de la batterie
+//=======================
 float tensionBatterie() {
-  // mesure tension d'alimentation environ 12v
-  int AnGpioResult = analogRead(AnGpio);
-  // calcul du resultat en volt
-  float voutBat = ((AnGpioResult * tensionEsp32) / cad) + offsetCalcule;
+  float voutBat = 0.0;
+  // 10 mesures tension d'alimentation d'environ 12v
+  for (int i = 0; i < 10; i++) {
+    int AnGpioResult = analogRead(AnGpio);
+    // calcul du resultat en volt
+    voutBat = voutBat + (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
+    delay(10);
+  }
+  voutBat = voutBat / 10;
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
   return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;

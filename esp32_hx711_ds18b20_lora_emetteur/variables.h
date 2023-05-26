@@ -42,7 +42,7 @@ float calibration_factor = -20200;       // calibration factor avec valeur connu
 
 #elif RUCHE_NUMERO == 03
 // offset pour ruche jlm2 rfm95
-float calibration_factor = -20200;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+float calibration_factor = -20900;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
 
 #elif RUCHE_NUMERO == 11
 // offset pour ruche loic1 rfm95
@@ -91,7 +91,7 @@ const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
 
 #elif RUCHE_NUMERO == 03
 // offset pour ruche jlm2 rfm95
-const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
+const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
 
 #elif RUCHE_NUMERO == 11
 // offset pour ruche loic1 rfm95
@@ -152,7 +152,7 @@ byte synchroLora = 0xF3;
 #define TIME_TO_SLEEP   241    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 03
-#define TIME_TO_SLEEP   127    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   307    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
@@ -207,7 +207,7 @@ float correction = 0.15 ; // correction erreurs des resistances
 float correction = -0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 03
-float correction = -0.65 ; // correction erreurs des resistances
+float correction = -1.3 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
 float correction = -0.35 ; // correction erreurs des resistances
