@@ -564,15 +564,25 @@ void getReadings() {
       Serial.println(F("Erreur de lecture du capteur DS18B20"));
     }
   }
-
-  Ruche.vBat = tensionBatterie();
-  delay(20);
-  RucheControl.vBat = tensionBatterie();
-  // test tension aberrante
-  if ((Ruche.vBat > (RucheControl.vBat + tensionAberrante)) or (Ruche.vBat < (RucheControl.vBat - tensionAberrante))) {
+  // calcul de la tension de la batterie
+  //----------------------
+  // ruche 04 jlm autonome
+  //----------------------
+#if RUCHE_NUMERO == 04
+  BoitierCapteur.vBat = tensionBatterie(); // pour un boitier capteur
+#else
+  Ruche.vBat = tensionBatterie();  // pour un boitier ruche
+  /*
+    delay(20);
+    RucheControl.vBat = tensionBatterie();  // control pour un boitier ruche
+    // test tension aberrante
+    if ((Ruche.vBat > (RucheControl.vBat + tensionAberrante)) or (Ruche.vBat < (RucheControl.vBat - tensionAberrante))) {
     delay(20);
     Ruche.vBat = tensionBatterie();
-  }
+    }
+  */
+#endif
+  delay(20);
 
   Serial.print("Weight: ");
   Serial.print(Ruche.poids, 3); //Up to 3 decimal points
@@ -732,7 +742,7 @@ void coupureEnergie () {
   preferences.begin("counterID", false);
 
   // Remove all preferences under the opened namespace
-  //preferences.clear();
+  // preferences.clear();
 
   // Or remove the counterID key only
   //preferences.remove("counterID");
@@ -784,27 +794,15 @@ float tensionBatterie() {
   Serial.println(voutBat);
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-  //return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  //----------------------
+  // ruche 04 jlm autonome
+  //----------------------
+#if RUCHE_NUMERO == 04
   return ((voutBat * (R1 + R2)) / R2) + correction;
+#else
+  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+#endif
 }
-/*
- //=============
-// Read Battery
-//=============
-float tensionBatterie() {
-  // mesure tension d'alimentation environ 5v
-  int AnGpioResult = analogRead(AnGpio);
-  // calcul du resultat en volt
-  float voutBat = ((AnGpioResult * tensionEsp32) / cad) + offsetCalcule;
-  Serial.print("tension mesuree : ");
-  Serial.println(AnGpioResult);
-  Serial.print("tension voutBat : ");
-  Serial.println(voutBat);
-  // calcul de la tension en sortie du pont de resistance
-  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-  return ((voutBat * (R1 + R2)) / R2) + correction;
-}
- */
 
 //=======
 // SETUP
@@ -824,7 +822,6 @@ void setup() {
     Serial.print("Parasite power is: ");
     if (sensors.isParasitePowerMode()) Serial.println("ON");
     else Serial.println("OFF");
-
   */
 
   // initialisation load cell
@@ -832,14 +829,14 @@ void setup() {
   scale.set_offset(LOADCELL_OFFSET);     // offset
   scale.set_scale(calibration_factor);   // Calibration Factor obtained from first sketch (divider)
   //scale.tare(); // Reset the scale to 0
-  /*
-    Then, it calls several methods that you can use to get readings using the library.
-    read(): gets a raw reading from the sensor
-    read_average(number of readings): gets the average of the latest defined number of readings
-    get_value(number of readings): gets the average of the last defined number of readings minus the tare weight;
-    get_units(number of readings): gets the average of the last defined number of readings minus the tare weight divided by the calibration factor
-    this will output a reading in your desired units.
-  */
+
+  // Then, it calls several methods that you can use to get readings using the library.
+  // read(): gets a raw reading from the sensor
+  // read_average(number of readings): gets the average of the latest defined number of readings
+  // get_value(number of readings): gets the average of the last defined number of readings minus the tare weight;
+  // get_units(number of readings): gets the average of the last defined number of readings minus the tare weight divided by the calibration factor
+  // this will output a reading in your desired units.
+
   //rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
 
 #if oled
@@ -879,19 +876,8 @@ void setup() {
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(300);
-  BoitierCapteur.vBat = tensionBatterie(); // calcul de la tension de la batterie
-  /*
-    BoitierCapteurControl.vBat = tensionBatterie();
-    // test tension aberrante
-    if ((BoitierCapteur.vBat > (BoitierCapteurControl.vBat + tensionAberrante)) or (BoitierCapteur.vBat < (BoitierCapteurControl.vBat - tensionAberrante))) {
-    delay(20);
-    BoitierCapteur.vBat = tensionBatterie();
-    }
-  */
   etatInterrupteur();  // etat de l'interrupteur
-
   coupureEnergie ();   // sauvegarde de counter_ID en cas de coupure de l'energie
-
 #endif
 
   sendReadings();      // envoi des donnees
@@ -960,61 +946,4 @@ void setup() {
 void loop() {
   // This is not going to be called
   // utilise pour le reglage de l'offset et de la calibration de la charge
-  /*
-    long now = millis();
-
-    //Affichage du poids et de la temperature toutes les 10 secondes
-    if (now - lastMsg > 1000 * 10) {
-      lastMsg = now;
-      getReadings();
-      sendReadings();
-
-        Serial.println("Before setting up the scale:");
-        Serial.print("read: \t\t");
-        Serial.println(scale.read());      // print a raw reading from the ADC
-
-        Serial.print("read average: \t\t");
-        Serial.println(scale.read_average(20));   // print the average of 20 readings from the ADC
-
-        Serial.print("get value: \t\t");
-        Serial.println(scale.get_value(5));   // print the average of 5 readings from the ADC minus the tare weight (not set yet)
-
-        Serial.print("get units: \t\t");
-        Serial.println(scale.get_units(5), 3); // print the average of 5 readings from the ADC minus tare weight (not set) divided
-
-    }
-  */
 }
-
-/*
-   //https://github.com/milesburton/Arduino-Temperature-Control-Library/blob/master/examples/Single/Single.ino
-   //https://github.com/milesburton/Arduino-Temperature-Control-Library/tree/master/examples/Simple
-  // call sensors.requestTemperatures() to issue a global temperature
-  // request to all devices on the bus
-  Serial.print("Requesting temperatures...");
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  Serial.println("DONE");
-  // After we got the temperatures, we can print them here.
-  // We use the function ByIndex, and as an example get the temperature from the first sensor only.
-  float tempC = sensors.getTempCByIndex(0);
-
-  // Check if reading was successful
-  if (tempC != DEVICE_DISCONNECTED_C)
-  {
-    Serial.print("Temperature for the device 1 (index 0) is: ");
-    Serial.println(tempC);
-  }
-  else
-  {
-    Serial.println("Error: Could not read temperature data");
-  }
-
-
-  // Affichage de la température
-  Serial.print(F("Temperature : "));
-  Serial.print(temperature, 1);
-  Serial.write(176); // Caractère degré
-  Serial.write('C');
-  Serial.println();
-
-*/

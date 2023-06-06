@@ -230,7 +230,14 @@ struct capteur_bme280 {
 #define ADDRESS 0x76                                  // premiere partie adresse ic2 bme280
 #define tempsPause 30                                 // Nbre de secondes de pause (3600 = 1H00)
 #define SEALEVELPRESSURE_HPA (1013.25)                // pression au niveau de la mer, reference
+//----------------------
+// ruche 04 jlm autonome
+//----------------------
+#if RUCHE_NUMERO == 04
+#define COMPENSATION -1.9                             // compensation de la valeur de temperature du bme280
+#else
 #define COMPENSATION -1.3                             // compensation de la valeur de temperature du bme280
+#endif
 float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
 float hum = 0.0;                                      // Valeurs contenant la valeur d'humidite de la sonde bme280.
 int   hum_stat = 0;                                   // Humidity status: 0 - Normal, 1 - Comfort, 2 - Dry, 3 - Wet, de la sonde bme280
@@ -260,7 +267,7 @@ const int temperatureAberrante = 6; //test de le temperature aberrante pour rela
 //====================
 // float analogReadReference  = 1.1 ; // reference theorique
 float offsetCalcule = 0.226;// offset mesure par voltmetre
-int R1 = 27000;  // resistance r1 du pont
+int R1 = 27000;   // resistance r1 du pont
 int R2 = 10000;   // resistance r2 du pont
 int cad = 4095 ;  // pas du convertisseur
 float tensionEsp32 = 3.3 ; // tension de reference
