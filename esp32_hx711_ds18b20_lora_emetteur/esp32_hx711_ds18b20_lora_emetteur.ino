@@ -18,6 +18,7 @@
 // inclusion des bibliothèques
 //=============================
 #include "variables.h" // fichier variables
+#include "secrets.h"   // fichier secrets
 
 // bibliotheque load cell hx711
 #include "HX711.h"
@@ -38,16 +39,34 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-//Libraries for OLED Display
 #include <Wire.h>
+
+#if oled
+//Libraries for OLED Display
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#endif
 
 // HX711 circuit wiring
 #define DOUT  23
 #define CLK  25
 
 HX711 scale;  // objet scale
+
+// ruche 04 jlm autonome
+#if RUCHE_NUMERO == 04
+// pour sauvegarder donnees a chaque coupure de l'alimentation
+#include <Preferences.h>
+
+// Libraries BME280
+#include <Adafruit_BME280.h>
+#include <Adafruit_Sensor.h>
+
+// include button pour le contacteur
+#include <Button.h>
+
+Preferences preferences;  // Save Data Permanently
+#endif
 
 //=================================
 // structure de donnees d'une ruche
@@ -98,6 +117,44 @@ byte type_s;
 byte data[12];
 byte addr[8];
 
+// ruche 04 jlm autonome
+#if RUCHE_NUMERO == 04
+//=========
+// BME280
+//=========
+Adafruit_BME280 bme280;                                     // I2C
+//Adafruit_BME280 bme(BME_CS);                              // hardware SPI
+//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
+//==================================
+// objets de donnees des Capteurs
+//==================================
+// objet capteurs et control
+boitierCapteur BoitierCapteur = {
+  .numBoitierCapteur = BOITIER_CAPTEUR_NUMERO,
+  .nameBoitierCapteur = NAME_BOITIER,
+  .interrupteur = true,
+  .tempeDS18B20 = 0.00,
+  .vBat = 0.00
+};
+
+// objet bme280
+capteur_bme280 Capteur_bme280 = {
+  .tempe = "",
+  .humi = "",
+  .pression = "",
+  .hum_stat = "",
+  .bar_for = ""
+};
+
+// conversion de string to int : toInt()  string to float :  toFloat()
+// Capteur_ds18b20.tempe = String(temp_ds18b20, 2); // convert float to string avec 2 decimal apres la virgule
+
+//=======
+// Button
+//=======
+Button interrupteur (33);   // contacteur gpio33
+#endif
+
 //================================================================
 // brochage de l'emetteur/recepteur lora en fonction de la carte
 // define the pins used by the LoRa transceiver module ttgo sx1276
@@ -120,6 +177,7 @@ byte addr[8];
 int txPower = 20; // power of tx lora 17 par default (2 to 20)
 #define PABOOST true
 
+#if oled
 //==========
 // OLED pins
 //==========
@@ -130,6 +188,7 @@ int txPower = 20; // power of tx lora 17 par default (2 to 20)
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
+#endif
 
 
 /****************************************************
@@ -155,7 +214,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
 
 #define uS_TO_S_FACTOR 1000000  // Conversion factor for micro seconds to seconds
 
-RTC_DATA_ATTR int bootCount = 0; // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
+RTC_DATA_ATTR int bootCount = 0;   // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
 
 //===========================================
 //Method to print the reason by which ESP32
@@ -179,6 +238,7 @@ void print_wakeup_reason() {
 
 // packet counter
 RTC_DATA_ATTR  int readingID = 0; // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
+unsigned int counterID = 0;       // compteur ID
 int counter = 0;                  // compteur
 String LoRaMessage = "";          // message lora avant envoi
 long lastMsg = 0;
@@ -207,6 +267,7 @@ int  AnGpio = 35; // GPIO 35 is Now AN Input 1
 //=====
 //#define LED_BOARD 2  // gpio2
 
+#if oled
 //=========================
 // Initialize OLED display
 //=========================
@@ -229,6 +290,7 @@ void startOLED() {
   display.setCursor(0, 0);
   display.print("PROJET LORA SENDER");
 }
+#endif
 
 //========================
 // Initialize LoRa module
@@ -247,10 +309,12 @@ void startLoRA() {
   }
   if (counter == 10) {
     Serial.println("Starting LoRa failed!");
+#if oled
     display.setCursor(0, 10);
     display.clearDisplay();
     display.print("Starting LoRa failed!");
     display.display();
+#endif
 
   } else {
     // chaque demarrage de la radio; activation dans le CRC
@@ -277,10 +341,12 @@ void startLoRA() {
     //LoRa.setTxPower(txPower,PABOOST);
 
     Serial.println("LoRa Initialization OK!");
+#if oled
     display.setCursor(0, 10);
     display.clearDisplay();
     display.print("LoRa Initializing OK!");
     display.display();
+#endif
   }
 
   // Change sync word (0xF3) to match the receiver
@@ -296,14 +362,22 @@ void startLoRA() {
 // Write LoRa Send
 //===============================================
 void sendReadings() {
+  // ruche 04 jlm autonome
+#if RUCHE_NUMERO != 04
   // message a envoyer
-  LoRaMessage = String(readingID) + "/" + String(Ruche.tempe) + "&" + String(Ruche.numRuche) + "#" + String(Ruche.poids) + "{" + String(Ruche.vBat);
+  LoRaMessage = String(readingID) +
+                "/" + String(Ruche.tempe) +
+                "&" + String(Ruche.numRuche) +
+                "#" + String(Ruche.poids) +
+                "{" + String(Ruche.vBat);
+
   String message = LoRaMessage;
   //Send LoRa packet to receiver
   LoRa.beginPacket();
   LoRa.print(LoRaMessage);
   LoRa.endPacket();
 
+#if oled
   display.clearDisplay();
   display.setCursor(0, 0);
   display.setTextSize(1);
@@ -333,6 +407,7 @@ void sendReadings() {
   display.setCursor(54, 50);
   display.print(readingID);
   display.display();
+#endif
 
   Serial.print("Message LoRa envoye: ");
   Serial.println(message);
@@ -352,12 +427,49 @@ void sendReadings() {
   //Serial.println();
 
   delay(3000);
-
   // suivi chronologique de l'envoi des messages lora
   ++readingID;
   if (readingID >= 10) {
     readingID =  0;
   }
+#elif RUCHE_NUMERO == 04
+  // message a envoyer
+  LoRaMessage = String(counterID) +
+                "/" + String(BoitierCapteur.tempeDS18B20) +
+                "&" + String(BoitierCapteur.numBoitierCapteur) +
+                "#" + String(BoitierCapteur.interrupteur) +
+                "{" + String(BoitierCapteur.vBat) +
+                "}" + Capteur_bme280.tempe +
+                "(" + Capteur_bme280.pression +
+                ")" + Capteur_bme280.humi +
+                "@" + BoitierCapteur.nameBoitierCapteur +
+                "~" + String(hum_stat) +
+                "^" + String(bar_for);
+
+  String message = LoRaMessage;
+  //Send LoRa packet to receiver
+  LoRa.beginPacket();
+  LoRa.print(LoRaMessage);
+  LoRa.endPacket();
+  delay(1000);
+
+  Serial.print("Message LoRa envoye: ");
+  Serial.println(message);
+  Serial.print("Sending packet counterID : ");
+  Serial.println(counterID);
+  Serial.print("Temperature DS18B20: ");
+  Serial.print(BoitierCapteur.tempeDS18B20);
+  Serial.println(" °C");
+  Serial.print("Boitier capteur N°: ");
+  Serial.println(BoitierCapteur.numBoitierCapteur);
+  Serial.print("Temperature BME280: ");
+  Serial.println(Capteur_bme280.tempe);
+  Serial.print("tension d'alimentation : ");
+  Serial.print(BoitierCapteur.vBat, 2);
+  Serial.println(" V");
+  Serial.println();
+#endif
+
 }
 
 //===============================================================
@@ -470,6 +582,178 @@ void getReadings() {
   }
 }
 
+// ruche 04 jlm autonome
+#if RUCHE_NUMERO == 04
+//=============
+// Read BME280
+//=============
+// BME280
+void getSondes_bme280() {
+  temp = bme280.readTemperature(); //lecture de la temperature
+  Capteur_bme280.tempe = String(temp, 2); // convert float to string avec 2 decimal apres la virgule
+  delay(100); // pause 100ms
+
+  hum = bme280.readHumidity();  // lecture de l'humidite
+  Capteur_bme280.humi = String(hum, 0); // convert float to string avec 0 decimal apres la virgule
+  delay(100); // pause 100ms
+  // Si vous écrivez :
+  //float pressure = .01 * bme280.getPressure() ;
+  //Serial.print (pressure , 2) ;
+  //Vous imprimerez par exemple : 991.17, C’est normal, vous multipliez un flottant (0.01) par un uint32_t (getPressure() ), la conversion implicite vous donne bien un float avec toutes ses décimales.
+  //mais si vous écrivez
+  //float pressure = bme280.getPressure() / 100;
+  //Vous imprimerez : 991.00 en perdant les deux chiffres significatifs ! C’est une faute, vous divisez un uint32_t par un entier, le résultat est un entier, converti ensuite en float et il n’y a donc rien après la virgule.
+  //Par contre en écrivant /100.0 , vous divisez bien un uint32_t par un double,  la conversion implicite vous donne bien un float avec toutes ses décimales.
+  //Les conversions de types sont complexes et sujettes à bien des erreurs…
+  pre = bme280.readPressure() / 100.0;  // lecture de la pression / 100
+
+  //Valeur retenue = (Valeur lue * coefficient multiplicateur) + offset
+  //Suivant les cartes, coefficients multiplicateurs entre .99 et 1.1 et offsets de +/- 3 hPa
+  pre = (pre * 1.0) + 2; // correction de la lecture de la pression en fonction du composant
+  delay(100); // pause 100ms
+  pre = bme280.seaLevelForAltitude(ALTITUDE, pre);  // pression calculee
+  Capteur_bme280.pression = String(pre, 0); // convert float string avec 0 decimal apres la virgule
+  //float alt = bme.readAltitude(SEALEVELPRESSURE_HPA);  // altitude du lieu calcule
+  //Forecast: 0 None, 1 Sunny, 2 PartlyCloudy, 3 Cloudy, 4 Rain
+  //-(altitude / 8) pour la correction due a l'atltitude !!!
+
+  // Forecast: 0 - None, 1 - Sunny, 2 - PartlyCloudy, 3 - Cloudy, 4 - Rain, de la sonde bme280
+  bar_for = 0;
+  if (pre < 1006) {
+    bar_for = 4; // rain
+    Capteur_bme280.bar_for = "rain";
+  } else if ((pre >= 1006 ) & (pre < 1013 )) {
+    bar_for = 3; // cloudy
+    Capteur_bme280.bar_for = "cloudy";
+  } else if ((pre >= 1013 ) & (pre < 1020 )) {
+    bar_for = 2; // Partly Cloudy
+    Capteur_bme280.bar_for = "partly cloudy";
+  } else if (pre >= 1020 ) {
+    bar_for = 1; // wet / sunny
+    Capteur_bme280.bar_for = "wet sunny";
+  } else {
+    bar_for = 0;  // none
+    Capteur_bme280.bar_for = "none";
+  }
+
+  // Humidity status: 0 Normal, 1 Comfort, 2 Dry, 3 Wet
+  hum_stat = 0;
+  if (hum < 30) {
+    hum_stat = 2; // dry
+    Capteur_bme280.hum_stat = "dry";
+  } else if ((hum >= 30) & (hum < 45)) {
+    hum_stat = 0; // normal
+    Capteur_bme280.hum_stat = "normal";
+  } else if ((hum >= 45) & (hum < 70)) {
+    hum_stat = 1; // confort
+    Capteur_bme280.hum_stat = "comfort";
+  } else if (hum >= 70) {
+    hum_stat = 3; // humide
+    Capteur_bme280.hum_stat = "wet";
+  }
+
+  // Uncomment the next line to set temperature in Fahrenheit
+  // (and comment the previous temperature line)
+  // temperature = 1.8 * bme.readTemperature() + 32; // Temperature in Fahrenheit
+
+  if ( debug ) {
+    Serial.print("temperature : ");
+    Serial.println(Capteur_bme280.tempe);
+    Serial.print("humidite : ");
+    Serial.println(Capteur_bme280.humi);
+    Serial.print("barometre : ");
+    Serial.println(Capteur_bme280.pression);
+    Serial.print("forecast : ");
+    Serial.println(Capteur_bme280.bar_for);
+    Serial.print("humidite status : ");
+    Serial.println(Capteur_bme280.hum_stat);
+    Serial.print("altitude : "); // pour les calculs avec la sonde bme280
+    Serial.println(ALTITUDE);
+  }
+}
+
+// chaine pour l'envoi des valeurs de la sonde BME280
+void chaine_bme280() {
+  // Convert the value to a char array
+  char valeur_temp[6] = ""; // temperature
+  dtostrf(temp, 2, 2, valeur_temp);
+  strcat(chaine, valeur_temp);
+  strcat(chaine, ";");
+  char valeur_hum[5] = ""; // humidite
+  dtostrf(hum, 2, 2, valeur_hum);
+  strcat(chaine, valeur_hum);
+  strcat(chaine, ";");
+  char valeur_hum_stat[1] = ""; // humidite confort
+  dtostrf(hum_stat, 1, 0, valeur_hum_stat);
+  strcat(chaine, valeur_hum_stat);
+  strcat(chaine, ";");
+  char valeur_pre[6] = ""; // pression barometrique
+  dtostrf(pre, 4, 0, valeur_pre);
+  strcat(chaine, valeur_pre);
+  strcat(chaine, ";");
+  char valeur_bar_for[1] = ""; // prevision meteo avec le barometre
+  dtostrf(bar_for, 1, 0, valeur_bar_for);
+  strcat(chaine, valeur_bar_for);
+  if (debug) {
+    Serial.print("Chaine Sonde bme280 : ");
+    Serial.println(chaine);
+  }
+}
+
+//=============
+// interrupteur
+//=============
+void etatInterrupteur() {
+  if (interrupteur.read() == 0) {
+    Serial.println("interrupteur ferme");
+    BoitierCapteur.interrupteur = false;  // true 1 ouvert et false 0 ferme
+  } else {
+    Serial.println("interrupteur ouvert");
+    BoitierCapteur.interrupteur = true;  // true 1 ouvert et false 0 ferme
+  }
+}
+
+//============================================
+// memorisation en cas de coupure de l'energie
+//============================================
+void coupureEnergie () {
+  // Open Preferences with my-app namespace. Each application module, library, etc
+  // has to use a namespace name to prevent key name collisions. We will open storage in
+  // RW-mode (second parameter has to be false).
+  // Note: Namespace name is limited to 15 chars.
+  preferences.begin("counterID", false);
+
+  // Remove all preferences under the opened namespace
+  //preferences.clear();
+
+  // Or remove the counterID key only
+  //preferences.remove("counterID");
+
+  // Get the counter value, if the key does not exist, return a default value of 0
+  // Note: Key name is limited to 15 chars.
+  counterID = preferences.getUInt("counterID", 0);
+
+  // Print the counter to Serial Monitor
+  Serial.printf("Current counterID value: %u\n", counterID);
+
+  // Increase counter by 1
+  counterID++;  // suivi chronologique du wakeup
+
+  // Store the counter to the Preferences
+  preferences.putUInt("counterID", counterID);
+
+  // Close the Preferences
+  preferences.end();
+
+  if (counterID >= 10) {
+    Serial.println("passage dans la boucle");
+    preferences.begin("counterID", false);
+    preferences.clear();
+    preferences.end();
+  }
+}
+#endif
+
 //=======================
 // tension de la batterie
 //=======================
@@ -492,6 +776,10 @@ float tensionBatterie() {
 // SETUP
 //=======
 void setup() {
+  // broche done du tpl5110
+  pinMode(DONEPIN, OUTPUT);
+  digitalWrite(DONEPIN, LOW);
+
   Serial.begin(SERIAL_BAUD);
   pinMode(AnGpio, INPUT); // anGpio lecture de la tension de la batterie
   //pinMode(LED_BOARD,OUTPUT); // led de la carte
@@ -520,15 +808,56 @@ void setup() {
   */
   //rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
 
+#if oled
   startOLED();
+#endif
   startLoRA();
+  Serial.print("Synchro lora : ");
+  Serial.println(synchroLora);
+
+  // ruche 04 jlm autonome
+#if RUCHE_NUMERO == 04
+  if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  } else {
+    // compensation de la lecture de la temperature du bme280
+    bme280.setTemperatureCompensation(COMPENSATION);
+    Serial.print("compensation bme280 : ");
+    Serial.println(COMPENSATION);
+  }
+
+  interrupteur.begin(); // bibliotheque interrupteur pour eviter les rebonds.
+#endif
 
   Serial.println("Demarrage OK");
   delay (300);
+
   //digitalWrite(LED_BOARD, HIGH); //allumage de la led de la carte
   getReadings();   // lecture des donnees
   sendReadings();  // envoi des donnees
   //digitalWrite(LED_BOARD, LOW);
+
+  // ruche 04 jlm autonome
+#if RUCHE_NUMERO == 04
+  getSondes_bme280();  // bme280
+  chaine_bme280();
+  delay(300);
+  BoitierCapteur.vBat = tensionBatterie(); // calcul de la tension de la batterie
+  /*
+    BoitierCapteurControl.vBat = tensionBatterie();
+    // test tension aberrante
+    if ((BoitierCapteur.vBat > (BoitierCapteurControl.vBat + tensionAberrante)) or (BoitierCapteur.vBat < (BoitierCapteurControl.vBat - tensionAberrante))) {
+    delay(20);
+    BoitierCapteur.vBat = tensionBatterie();
+    }
+  */
+  etatInterrupteur();  // etat de l'interrupteur
+
+  coupureEnergie (); // sauvegarde de counter_ID en cas de coupure de l'energie
+
+  sendReadings();      // envoi des donnees
+  delay(1000);
+#endif
 
   scale.power_down();     // put the ADC du hx711 in sleep mode
   Serial.println("ADC HX711 Going to sleep mode now");

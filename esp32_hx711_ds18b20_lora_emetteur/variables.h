@@ -9,13 +9,15 @@
 #define SERIAL_BAUD 115200    // vitesse moniteur serie
 #define SerialMonitor  1      // 1 true, 0 false
 #define debug 1               // true for use  Display log message if True
+#define oled  0               // oled 1 : afficheur present
 
 //=============
 //Numero Ruche
 //=============
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
-#define RUCHE_NUMERO  03      // numero de la ruche jlm3
+//#define RUCHE_NUMERO  03      // numero de la ruche jlm3
+#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -25,6 +27,11 @@
 //#define RUCHE_NUMERO  17      // numero de la ruche loic7
 //#define RUCHE_NUMERO  18      // numero de la ruche loic8
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
+
+//=======
+//TPL5110
+//=======
+#define DONEPIN  32  // done du tpl5110 en gipo32
 
 //=====================
 //Load Cell with HX711
@@ -41,6 +48,10 @@ float calibration_factor = -20332;       // calibration factor avec valeur connu
 float calibration_factor = -20200;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
 
 #elif RUCHE_NUMERO == 03
+// offset pour ruche jlm2 rfm95
+float calibration_factor = -20900;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+
+#elif RUCHE_NUMERO == 04
 // offset pour ruche jlm2 rfm95
 float calibration_factor = -20900;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
 
@@ -90,7 +101,11 @@ const long LOADCELL_OFFSET = -104200;    // -104200
 const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
 
 #elif RUCHE_NUMERO == 03
-// offset pour ruche jlm2 rfm95
+// offset pour ruche jlm3 rfm95
+const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
+
+#elif RUCHE_NUMERO == 04
+// offset pour ruche jlm4 rfm95
 const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
 
 #elif RUCHE_NUMERO == 11
@@ -154,6 +169,9 @@ byte synchroLora = 0xF3;
 #elif RUCHE_NUMERO == 03
 #define TIME_TO_SLEEP   307    // Time ESP32 will go to sleep (in seconds)
 
+#elif RUCHE_NUMERO == 04
+#define TIME_TO_SLEEP   307    // Time ESP32 will go to sleep (in seconds)
+
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
 
@@ -183,6 +201,55 @@ byte synchroLora = 0xF3;
 #endif
 
 
+//----------------------
+// ruche 04 jlm autonome
+//----------------------
+#if RUCHE_NUMERO == 04
+//==================================
+// structure de donnees des Capteurs
+//==================================
+struct boitierCapteur {
+  int numBoitierCapteur;     // numero du boitier
+  String nameBoitierCapteur; // nom du boitier
+  bool interrupteur;         // interrupteur
+  float tempeDS18B20;        // temperature DS18B20
+  float vBat;                // tension batterie
+};
+
+struct capteur_bme280 {
+  String tempe;          // temperature
+  String humi;           // humidite
+  String pression;       // pression
+  String hum_stat;       // Humidity status: 0 Normal, 1 Comfort, 2 Dry, 3 Wet
+  String bar_for;        // Forecast: 0 None, 1 Sunny, 2 PartlyCloudy, 3 Cloudy, 4 Rain
+};
+
+//==============
+// Sonde BME280
+//==============
+#define ADDRESS 0x76                                  // premiere partie adresse ic2 bme280
+#define tempsPause 30                                 // Nbre de secondes de pause (3600 = 1H00)
+#define SEALEVELPRESSURE_HPA (1013.25)                // pression au niveau de la mer, reference
+#define COMPENSATION -1.3                             // compensation de la valeur de temperature du bme280
+float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
+float hum = 0.0;                                      // Valeurs contenant la valeur d'humidite de la sonde bme280.
+int   hum_stat = 0;                                   // Humidity status: 0 - Normal, 1 - Comfort, 2 - Dry, 3 - Wet, de la sonde bme280
+float  pre = 0.0;                                     // pression de la sonde bme280
+int  preStep = 0;                                     // pression de la sonde bme280 stepper
+int  memPreStep = 0;                                  // pression de la sonde bme280 stepper memorisation
+int bar_for = 0;                                      // Forecast: 0 - None, 1 - Sunny, 2 - PartlyCloudy, 3 - Cloudy, 4 - Rain, de la sonde bme280
+float alt = 0.0;                                      // altitude pour les calculs avec la sonde bme280
+
+//========
+// Sondes
+//========
+// chaine (tableau de caracteres) pour l'envoi des données des sondes
+const int taille = 30;                                // taille du tableau pour l'envoi des valeurs des sondes
+char chaine[taille - 1] = "" ;                        // tableau pour l'envoi des valeurs des sondes
+int num_sensors;                                      // Create variables to hold the device addresses
+#endif
+
+
 //====================
 // Temperature ds18b20
 //====================
@@ -207,6 +274,9 @@ float correction = 0.15 ; // correction erreurs des resistances
 float correction = -0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 03
+float correction = -0.15 ; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 04
 float correction = -0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
