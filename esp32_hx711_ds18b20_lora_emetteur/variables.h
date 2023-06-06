@@ -260,8 +260,8 @@ const int temperatureAberrante = 6; //test de le temperature aberrante pour rela
 //====================
 // float analogReadReference  = 1.1 ; // reference theorique
 float offsetCalcule = 0.226;// offset mesure par voltmetre
-int R1 = 100000;  // resistance r1 du pont
-int R2 = 22000;   // resistance r2 du pont
+int R1 = 27000;  // resistance r1 du pont
+int R2 = 10000;   // resistance r2 du pont
 int cad = 4095 ;  // pas du convertisseur
 float tensionEsp32 = 3.3 ; // tension de reference
 float tensionDiode = 0.74 ; // correction tension de la diode de protection invertion 1n4007
@@ -277,7 +277,7 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 04
-float correction = -0.15 ; // correction erreurs des resistances
+float correction = -0.25; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
 float correction = -0.35 ; // correction erreurs des resistances

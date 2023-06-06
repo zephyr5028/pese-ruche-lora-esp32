@@ -52,8 +52,9 @@
 #define CLK  25
 
 HX711 scale;  // objet scale
-
+//----------------------
 // ruche 04 jlm autonome
+//----------------------
 #if RUCHE_NUMERO == 04
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
@@ -117,7 +118,9 @@ byte type_s;
 byte data[12];
 byte addr[8];
 
+//----------------------
 // ruche 04 jlm autonome
+//----------------------
 #if RUCHE_NUMERO == 04
 //=========
 // BME280
@@ -362,7 +365,9 @@ void startLoRA() {
 // Write LoRa Send
 //===============================================
 void sendReadings() {
+  //----------------------
   // ruche 04 jlm autonome
+  //----------------------
 #if RUCHE_NUMERO != 04
   // message a envoyer
   LoRaMessage = String(readingID) +
@@ -543,19 +548,20 @@ void getReadings() {
     Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
   }
 
+  float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
-  if (getTemperature(&Ruche.tempe, true) != READ_OK) {
-    Serial.println(F("Erreur de lecture du capteur"));
+  if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
+    Serial.println(F("Erreur de lecture du capteur DS18B20"));
   }
-  delay(200);
-  if (getTemperature(&RucheControl.tempe, true) != READ_OK) {
-    Serial.println(F("Erreur de lecture du capteur"));
+  delay(300);
+  if (getTemperature(&BoitierCapteurControlTempeDS18B20, true) != READ_OK) {
+    Serial.println(F("Erreur de lecture du capteur DS18B20"));
   }
   // test + ou - temperatureAberrante pour eviter les mesure aberrantes
-  if ((Ruche.tempe > (RucheControl.tempe + temperatureAberrante)) or (Ruche.tempe < (RucheControl.tempe - temperatureAberrante))) {
-    delay(200);
-    if (getTemperature(&Ruche.tempe, true) != READ_OK) {
-      Serial.println(F("Erreur de lecture du capteur"));
+  if ((BoitierCapteur.tempeDS18B20 > (BoitierCapteurControlTempeDS18B20 + temperatureAberrante)) or (BoitierCapteur.tempeDS18B20 < (BoitierCapteurControlTempeDS18B20 - temperatureAberrante))) {
+    delay(300);
+    if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
+      Serial.println(F("Erreur de lecture du capteur DS18B20"));
     }
   }
 
@@ -582,7 +588,9 @@ void getReadings() {
   }
 }
 
+//----------------------
 // ruche 04 jlm autonome
+//----------------------
 #if RUCHE_NUMERO == 04
 //=============
 // Read BME280
@@ -657,17 +665,17 @@ void getSondes_bme280() {
   // temperature = 1.8 * bme.readTemperature() + 32; // Temperature in Fahrenheit
 
   if ( debug ) {
-    Serial.print("temperature : ");
+    Serial.print("temperature_BME280 : ");
     Serial.println(Capteur_bme280.tempe);
-    Serial.print("humidite : ");
+    Serial.print("humidite_BME280 : ");
     Serial.println(Capteur_bme280.humi);
-    Serial.print("barometre : ");
+    Serial.print("barometre_BME280 : ");
     Serial.println(Capteur_bme280.pression);
-    Serial.print("forecast : ");
+    Serial.print("forecast_BME280 : ");
     Serial.println(Capteur_bme280.bar_for);
-    Serial.print("humidite status : ");
+    Serial.print("humidite_status_BME280 : ");
     Serial.println(Capteur_bme280.hum_stat);
-    Serial.print("altitude : "); // pour les calculs avec la sonde bme280
+    Serial.print("altitude du lieu : "); // pour les calculs avec la sonde bme280
     Serial.println(ALTITUDE);
   }
 }
@@ -759,18 +767,44 @@ void coupureEnergie () {
 //=======================
 float tensionBatterie() {
   float voutBat = 0.0;
+  int AnGpioResult = 0;
   // 10 mesures tension d'alimentation d'environ 12v
   for (int i = 0; i < 10; i++) {
-    int AnGpioResult = analogRead(AnGpio);
+    // The voltage measured is then assigned to a value between 0 and 4095
+    // in which 0 V corresponds to 0, and 3.3 V corresponds to 4095
+    AnGpioResult = analogRead(AnGpio);
     // calcul du resultat en volt
     voutBat = voutBat + (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
     delay(10);
   }
   voutBat = voutBat / 10;
+  Serial.print("tension mesuree : ");
+  Serial.println(AnGpioResult);
+  Serial.print("tension voutBat : ");
+  Serial.println(voutBat);
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  //return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  return ((voutBat * (R1 + R2)) / R2) + correction;
 }
+/*
+ //=============
+// Read Battery
+//=============
+float tensionBatterie() {
+  // mesure tension d'alimentation environ 5v
+  int AnGpioResult = analogRead(AnGpio);
+  // calcul du resultat en volt
+  float voutBat = ((AnGpioResult * tensionEsp32) / cad) + offsetCalcule;
+  Serial.print("tension mesuree : ");
+  Serial.println(AnGpioResult);
+  Serial.print("tension voutBat : ");
+  Serial.println(voutBat);
+  // calcul de la tension en sortie du pont de resistance
+  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
+  return ((voutBat * (R1 + R2)) / R2) + correction;
+}
+ */
 
 //=======
 // SETUP
@@ -815,7 +849,9 @@ void setup() {
   Serial.print("Synchro lora : ");
   Serial.println(synchroLora);
 
+  //----------------------
   // ruche 04 jlm autonome
+  //----------------------
 #if RUCHE_NUMERO == 04
   if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
@@ -834,10 +870,11 @@ void setup() {
 
   //digitalWrite(LED_BOARD, HIGH); //allumage de la led de la carte
   getReadings();   // lecture des donnees
-  sendReadings();  // envoi des donnees
   //digitalWrite(LED_BOARD, LOW);
 
+  //----------------------
   // ruche 04 jlm autonome
+  //----------------------
 #if RUCHE_NUMERO == 04
   getSondes_bme280();  // bme280
   chaine_bme280();
@@ -853,11 +890,12 @@ void setup() {
   */
   etatInterrupteur();  // etat de l'interrupteur
 
-  coupureEnergie (); // sauvegarde de counter_ID en cas de coupure de l'energie
+  coupureEnergie ();   // sauvegarde de counter_ID en cas de coupure de l'energie
+
+#endif
 
   sendReadings();      // envoi des donnees
   delay(1000);
-#endif
 
   scale.power_down();     // put the ADC du hx711 in sleep mode
   Serial.println("ADC HX711 Going to sleep mode now");
@@ -875,6 +913,11 @@ void setup() {
 
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
+
+  // toggle DONE HIGH to cut power with TPL5110
+  digitalWrite(DONEPIN, HIGH); // enclenche l'arret du tpl5110
+  delay(100);
+  digitalWrite(DONEPIN, LOW);
 
   //-------------------------------------
   // First we configure the wake up source
