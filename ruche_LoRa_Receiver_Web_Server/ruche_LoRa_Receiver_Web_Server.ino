@@ -581,26 +581,22 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
 #if LOIC
   if (Ruche.numRuche == r1) {
     ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(2, Ruche.tempe);  // temperature de la ruche
   } else if (Ruche.numRuche == r2) {
-    ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(4, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(2, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r3) {
-    ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(6, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r4) {
-    ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(8, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(4, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r5) {
-    
+    ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r6) {
-    
+    ThingSpeak.setField(6, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r7) {
-    
+    ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r8) {
-    
+    ThingSpeak.setField(8, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r9) {
-    
+   //ThingSpeak.setField(9, Ruche.poids);  // poids de la ruche
   }
 #endif
 }

@@ -547,7 +547,22 @@ void getReadings() {
     delay(200);
     Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
   }
-
+  // Lecture de la temperature ambiante a ~1Hz
+  if (getTemperature(&Ruche.tempe, true) != READ_OK) {
+    Serial.println(F("Erreur de lecture du capteur"));
+  }
+  delay(200);
+  if (getTemperature(&RucheControl.tempe, true) != READ_OK) {
+    Serial.println(F("Erreur de lecture du capteur"));
+  }
+  // test + ou - temperatureAberrante pour eviter les mesure aberrantes
+  if ((Ruche.tempe > (RucheControl.tempe + temperatureAberrante)) or (Ruche.tempe < (RucheControl.tempe - temperatureAberrante))) {
+    delay(200);
+    if (getTemperature(&Ruche.tempe, true) != READ_OK) {
+      Serial.println(F("Erreur de lecture du capteur"));
+    }
+  }
+#if RUCHE_NUMERO == 04
   float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -564,6 +579,8 @@ void getReadings() {
       Serial.println(F("Erreur de lecture du capteur DS18B20"));
     }
   }
+#endif
+
   // calcul de la tension de la batterie
   //----------------------
   // ruche 04 jlm autonome

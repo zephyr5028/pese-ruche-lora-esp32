@@ -17,14 +17,14 @@
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
-#define RUCHE_NUMERO  04      // numero de la ruche jlm4
+//#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
 //#define RUCHE_NUMERO  14      // numero de la ruche loic4
 //#define RUCHE_NUMERO  15      // numero de la ruche loic5
 //#define RUCHE_NUMERO  16      // numero de la ruche loic6
-//#define RUCHE_NUMERO  17      // numero de la ruche loic7
+#define RUCHE_NUMERO  17      // numero de la ruche loic7
 //#define RUCHE_NUMERO  18      // numero de la ruche loic8
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
 
@@ -81,7 +81,7 @@ float calibration_factor = -22900;       // calibration factor avec valeur connu
 
 #elif RUCHE_NUMERO == 17
 // offset pour ruche loic7 rfm95
-float calibration_factor = -22900;       // calibration factor avec valeur connue et tare a 0
+float calibration_factor = -19800;       // calibration factor avec valeur connue et tare a 0
 
 #elif RUCHE_NUMERO == 18
 // offset pour ruche loic8 rfm95
@@ -134,7 +134,7 @@ const long LOADCELL_OFFSET = -102500;
 
 #elif RUCHE_NUMERO == 17
 // offset pour ruche loic7 rfm95
-const long LOADCELL_OFFSET = -78300;
+const long LOADCELL_OFFSET = -86750;
 
 #elif RUCHE_NUMERO == 18
 // offset pour ruche loic8 rfm95
@@ -305,7 +305,7 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.25 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 17
-float correction = -0.45 ; // correction erreurs des resistances
+float correction = 0.35 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 18
 float correction = -0.35 ; // correction erreurs des resistances

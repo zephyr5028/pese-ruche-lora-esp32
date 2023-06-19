@@ -44,13 +44,13 @@ float weight;
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
 bool calibration = 0;                 // 1 = reglage calibration et 0 = reglage offset
-bool batterie = 0 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
+bool batterie = 1 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
-float calibration_factor = -22900;
+float calibration_factor = -19800;
 
 // 2eme : enlever tare au demarrage puis regler offset
-long LOADCELL_OFFSET = -103222;
+long LOADCELL_OFFSET = -86800;
 
 // float LOADCELL_DIVIDER = -20332;
 
@@ -151,7 +151,9 @@ void loop() {
   Serial.print(LOADCELL_OFFSET);
   Serial.println("");
   Serial.print("tension batterie = ");
-  Serial.println(tensionBatterie());
+  Serial.print(tensionBatterie());
+  Serial.print("   correction batterie = ");
+  Serial.println(correction);
   // reglages calibration / offset / corection batterie avec  + - a et z
   if (Serial.available())  {
     char temp = Serial.read();
