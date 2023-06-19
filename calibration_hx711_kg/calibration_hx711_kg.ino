@@ -43,8 +43,8 @@ float weight;
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 0;                 // 1 = reglage calibration et 0 = reglage offset
-bool batterie = 1 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
+bool calibration = 1;                 // 1 = reglage calibration et 0 = reglage offset
+bool batterie = 0 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
 float calibration_factor = -19800;
@@ -154,6 +154,7 @@ void loop() {
   Serial.print(tensionBatterie());
   Serial.print("   correction batterie = ");
   Serial.println(correction);
+  delay(500);
   // reglages calibration / offset / corection batterie avec  + - a et z
   if (Serial.available())  {
     char temp = Serial.read();
