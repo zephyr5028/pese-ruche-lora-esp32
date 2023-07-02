@@ -50,12 +50,13 @@
 struct ruche {
   String numRuche;  // numero de la ruche
   String poids;
-  String tempe;
+  String tempeDs18b20;
   String vBat;
+  String tempeBme280;
 };
 
 // objet ruche
-ruche Ruche = { .numRuche = "", .poids = "", .tempe = "", .vBat = ""}; // definition de la ruche
+ruche Ruche = { .numRuche = "", .poids = "", .tempeDs18b20 = "", .vBat = "", .tempeBme280 = ""}; // definition de la ruche
 
 // conversion de string to int : toInt()  string to float :  toFloat()
 
@@ -166,7 +167,7 @@ AsyncWebServer server(httpPort);
 String processor(const String& var) {
   //Serial.println(var);
   if (var == "TEMPERATURE") {
-    return Ruche.tempe;
+    return Ruche.tempeDs18b20;
   }
   else if (var == "READINGID") {
     return readingID;
@@ -297,7 +298,7 @@ void getLoRaData() {
     String LoRaData = LoRa.readString();
     // LoRaData format: readingID/temperature&soilMoisture#batterylevel
     // String example:  3/21.50&2#-4.27{5.54
-    // Ruche.numRuche = ""; Ruche.poids = ""; Ruche.tempe = ""; Ruche.vBat = "";
+    // Ruche.numRuche = ""; Ruche.poids = ""; Ruche.tempeDs18b20 = ""; Ruche.vBat = "";
 
     Serial.print(LoRaData);
 
@@ -308,10 +309,11 @@ void getLoRaData() {
     int pos4 = LoRaData.indexOf('{');
     int pos5 = LoRaData.indexOf('}');
     readingID = LoRaData.substring(0, pos1);
-    Ruche.tempe = LoRaData.substring(pos1 + 1, pos2);
+    Ruche.tempeDs18b20 = LoRaData.substring(pos1 + 1, pos2);
     Ruche.numRuche = LoRaData.substring(pos2 + 1, pos3);
     Ruche.poids = LoRaData.substring(pos3 + 1, pos4);
-    Ruche.vBat = LoRaData.substring(pos4 + 1, LoRaData.length());
+    Ruche.vBat = LoRaData.substring(pos4 + 1, pos5);
+    Ruche.tempeBme280 = LoRaData.substring(pos5 + 1, LoRaData.length());
 
     Serial.println("");
     Serial.print("numero de la ruche : ");
@@ -352,7 +354,7 @@ void getLoRaData() {
   display.setCursor(0, 40);
   display.print("Temperature: ");
   display.setCursor(76, 40);
-  display.print(Ruche.tempe);
+  display.print(Ruche.tempeDs18b20);
   display.setCursor(112, 40);
   display.print("C");
 
@@ -555,18 +557,18 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
 #if JLM
   if (Ruche.numRuche == r1) {
     ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(2, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(2, Ruche.tempeDs18b20);  // temperature de la ruche
     //ThingSpeak.setField(7, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r2) {
     ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(4, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(4, Ruche.tempeDs18b20);  // temperature de la ruche
     //ThingSpeak.setField(8, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r3) {
     ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(6, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(6, Ruche.tempeDs18b20);  // temperature de la ruche
   } else if (Ruche.numRuche == r4) {
     ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
-    ThingSpeak.setField(8, Ruche.tempe);  // temperature de la ruche
+    ThingSpeak.setField(8, Ruche.tempeDs18b20);  // temperature de la ruche
   } else if (Ruche.numRuche == r5) {
 
   } else if (Ruche.numRuche == r6) {
@@ -696,7 +698,7 @@ void setup() {
     request->send_P(200, "text/plain", SolarNoon.c_str());
   });
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send_P(200, "text/plain", Ruche.tempe.c_str());
+    request->send_P(200, "text/plain", Ruche.tempeDs18b20.c_str());
   });
   server.on("/vbat", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/plain", Ruche.vBat.c_str());
@@ -778,28 +780,28 @@ void loop() {
             // envoi du poids
             SendData(idxDeviceRuche1Poids, "Ruche1_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
-            SendData(idxDeviceRuche1Temperature, "Ruche1_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche1Temperature, "Ruche1_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la baterrie
             SendData(idxDeviceRuches1TensionBatterie, "Ruche1_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "2") {
             // envoi du poids
             SendData(idxDeviceRuche2Poids, "Ruche2_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
-            SendData(idxDeviceRuche2Temperature, "Ruche2_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche2Temperature, "Ruche2_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la baterrie
             SendData(idxDeviceRuches2TensionBatterie, "Ruche2_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "3") {
             // envoi du poids
             SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
-            SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la batterie
             SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           } else if (Ruche.numRuche == "4") {
             // envoi du poids
             SendData(idxDeviceRuche4Poids, "Ruche4_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
             // envoi de la temperature
-            SendData(idxDeviceRuche4Temperature, "Ruche4_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            SendData(idxDeviceRuche4Temperature, "Ruche4_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la batterie
             SendData(idxDeviceRuches4TensionBatterie, "Ruche4_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           }
