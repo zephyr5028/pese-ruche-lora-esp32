@@ -43,11 +43,11 @@ float weight;
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 1;                 // 1 = reglage calibration et 0 = reglage offset
+bool calibration = 0;                 // 1 = reglage calibration et 0 = reglage offset
 bool batterie = 0 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
-float calibration_factor = -19800;
+float calibration_factor = -21600;
 
 // 2eme : enlever tare au demarrage puis regler offset
 long LOADCELL_OFFSET = -86800;

@@ -917,6 +917,8 @@ void setup() {
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
 
+  delay(500);
+  
   // toggle DONE HIGH to cut power with TPL5110
   digitalWrite(DONEPIN, HIGH); // enclenche l'arret du tpl5110
   delay(100);

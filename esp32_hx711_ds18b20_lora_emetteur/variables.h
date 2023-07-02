@@ -17,14 +17,14 @@
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
-//#define RUCHE_NUMERO  04      // numero de la ruche jlm4
+#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
 //#define RUCHE_NUMERO  14      // numero de la ruche loic4
 //#define RUCHE_NUMERO  15      // numero de la ruche loic5
 //#define RUCHE_NUMERO  16      // numero de la ruche loic6
-#define RUCHE_NUMERO  17      // numero de la ruche loic7
+//#define RUCHE_NUMERO  17      // numero de la ruche loic7
 //#define RUCHE_NUMERO  18      // numero de la ruche loic8
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
 
@@ -170,7 +170,7 @@ byte synchroLora = 0xF3;
 #define TIME_TO_SLEEP   307    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 04
-#define TIME_TO_SLEEP   307    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   313    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)

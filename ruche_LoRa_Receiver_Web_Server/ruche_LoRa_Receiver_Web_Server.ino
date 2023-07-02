@@ -306,6 +306,7 @@ void getLoRaData() {
     int pos2 = LoRaData.indexOf('&');
     int pos3 = LoRaData.indexOf('#');
     int pos4 = LoRaData.indexOf('{');
+    int pos5 = LoRaData.indexOf('}');
     readingID = LoRaData.substring(0, pos1);
     Ruche.tempe = LoRaData.substring(pos1 + 1, pos2);
     Ruche.numRuche = LoRaData.substring(pos2 + 1, pos3);
@@ -521,12 +522,12 @@ void thinkspeak() {
   if (SECRET_THINGSPEAK_TRUE and SECRET_WIFI_TRUE) {
     int num_ruche = Ruche.numRuche.toInt(); // string to int
 
-    if (JLM and num_ruche >= 1 and num_ruche <= 4) {
-      field_thinkspeak("1", "2", "3", "4", "5", "6", "7", "8", "9");  // numeros ruhes de 1 a 4
+    if (JLM and num_ruche >= 1 and num_ruche <= 9) {
+      field_thinkspeak("1", "2", "3", "4", "5", "6", "7", "8", "9");  // numeros ruhes de 1 a 9
       write_thingspeak (myChannelNumberJlm, myWriteAPIKeyJlm);
 
-    } else if (LOIC and num_ruche >= 11 and num_ruche <= 14) {
-      field_thinkspeak("11", "12", "13", "14", "15", "16", "17", "18", "19"); // Numeros ruches de 11 a 14
+    } else if (LOIC and num_ruche >= 11 and num_ruche <= 19) {
+      field_thinkspeak("11", "12", "13", "14", "15", "16", "17", "18", "19"); // Numeros ruches de 11 a 19
       write_thingspeak (myChannelNumberLoic, myWriteAPIKeyLoic);
     }
   }
@@ -555,26 +556,27 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
   if (Ruche.numRuche == r1) {
     ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(2, Ruche.tempe);  // temperature de la ruche
-    ThingSpeak.setField(7, Ruche.vBat);   // tension de la batterie
+    //ThingSpeak.setField(7, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r2) {
     ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(4, Ruche.tempe);  // temperature de la ruche
-    ThingSpeak.setField(8, Ruche.vBat);   // tension de la batterie
+    //ThingSpeak.setField(8, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r3) {
     ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
     ThingSpeak.setField(6, Ruche.tempe);  // temperature de la ruche
   } else if (Ruche.numRuche == r4) {
-
+    ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(8, Ruche.tempe);  // temperature de la ruche
   } else if (Ruche.numRuche == r5) {
-    
+
   } else if (Ruche.numRuche == r6) {
-    
+
   } else if (Ruche.numRuche == r7) {
-    
+
   } else if (Ruche.numRuche == r8) {
-    
+
   } else if (Ruche.numRuche == r9) {
-    
+
   }
 #endif
 
@@ -596,7 +598,7 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
   } else if (Ruche.numRuche == r8) {
     ThingSpeak.setField(8, Ruche.poids);  // poids de la ruche
   } else if (Ruche.numRuche == r9) {
-   //ThingSpeak.setField(9, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(9, Ruche.poids);  // poids de la ruche
   }
 #endif
 }
@@ -793,6 +795,13 @@ void loop() {
             SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
             // envoi de la tension de la batterie
             SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
+          } else if (Ruche.numRuche == "4") {
+            // envoi du poids
+            SendData(idxDeviceRuche4Poids, "Ruche4_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
+            // envoi de la temperature
+            SendData(idxDeviceRuche4Temperature, "Ruche4_temperature", Ruche.tempe.c_str()); // Envoi des données via JSON et MQTT
+            // envoi de la tension de la batterie
+            SendData(idxDeviceRuches4TensionBatterie, "Ruche4_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
           }
         }
       }
