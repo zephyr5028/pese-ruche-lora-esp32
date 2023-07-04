@@ -53,9 +53,9 @@
 
 HX711 scale;  // objet scale
 //----------------------
-// ruche 04 jlm autonome
+// ruche 05 jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
 
@@ -119,9 +119,9 @@ byte data[12];
 byte addr[8];
 
 //----------------------
-// ruche 04 jlm autonome
+// ruche 05 jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 //=========
 // BME280
 //=========
@@ -366,9 +366,9 @@ void startLoRA() {
 //===============================================
 void sendReadings() {
   //----------------------
-  // ruche 04 jlm autonome
+  // ruche 05 jlm autonome
   //----------------------
-#if RUCHE_NUMERO != 04
+#if RUCHE_NUMERO != 05
   // message a envoyer
   LoRaMessage = String(readingID) +
                 "/" + String(Ruche.tempe) +
@@ -437,7 +437,7 @@ void sendReadings() {
   if (readingID >= 10) {
     readingID =  0;
   }
-#elif RUCHE_NUMERO == 04
+#elif RUCHE_NUMERO == 05
   // message a envoyer
   LoRaMessage = String(counterID) +
                 "/" + String(BoitierCapteur.tempeDS18B20) +
@@ -562,7 +562,7 @@ void getReadings() {
       Serial.println(F("Erreur de lecture du capteur"));
     }
   }
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
   float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -583,9 +583,9 @@ void getReadings() {
 
   // calcul de la tension de la batterie
   //----------------------
-  // ruche 04 jlm autonome
+  // ruche 05 jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
   BoitierCapteur.vBat = tensionBatterie(); // pour un boitier capteur
 #else
   Ruche.vBat = tensionBatterie();  // pour un boitier ruche
@@ -616,9 +616,9 @@ void getReadings() {
 }
 
 //----------------------
-// ruche 04 jlm autonome
+// ruche 05 jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 //=============
 // Read BME280
 //=============
@@ -793,41 +793,34 @@ void coupureEnergie () {
 // tension de la batterie
 //=======================
 float tensionBatterie() {
-  /*
   float voutBat = 0.0;
   int AnGpioResult = 0;
   // 10 mesures tension d'alimentation d'environ 12v
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < numberOfReadingsBat; i++) {
     // The voltage measured is then assigned to a value between 0 and 4095
     // in which 0 V corresponds to 0, and 3.3 V corresponds to 4095
     AnGpioResult = analogRead(AnGpio);
     // calcul du resultat en volt
     voutBat = voutBat + (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
-    delay(10);
+    delay(50);
   }
-  voutBat = voutBat / 10;
-  Serial.print("tension mesuree : ");
+  voutBat = voutBat / numberOfReadingsBat;
+  Serial.print("tension mesuree adc : ");
   Serial.println(AnGpioResult);
   Serial.print("tension voutBat : ");
   Serial.println(voutBat);
+  Serial.print("tension batterie : ");
+  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
   //----------------------
-  // ruche 04 jlm autonome
+  // ruche 05 jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
   return ((voutBat * (R1 + R2)) / R2) + correction;
 #else
-  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
 #endif
-*/
- // mesure tension d'alimentation environ 12v
-  int AnGpioResult = analogRead(AnGpio);
-  // calcul du resultat en volt
-  float voutBat = ((AnGpioResult * tensionEsp32) / cad) + offsetCalcule;
-  // calcul de la tension en sortie du pont de resistance
-  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
 }
 
 //=======
@@ -851,7 +844,11 @@ void setup() {
   */
 
   // initialisation load cell
-  scale.begin(DOUT, CLK);
+  scale.begin(DOUT, CLK);      // loadcell hx711 broches DOUT et CLK
+  scale.power_down();          // put the ADC in sleep mode
+  delay(2500);
+  scale.power_up();            // reveil du hx711
+  delay(500);
   scale.set_offset(LOADCELL_OFFSET);     // offset
   scale.set_scale(calibration_factor);   // Calibration Factor obtained from first sketch (divider)
   //scale.tare(); // Reset the scale to 0
@@ -873,9 +870,9 @@ void setup() {
   Serial.println(synchroLora);
 
   //----------------------
-  // ruche 04 jlm autonome
+  // ruche 05 jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
   if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   } else {
@@ -896,9 +893,9 @@ void setup() {
   //digitalWrite(LED_BOARD, LOW);
 
   //----------------------
-  // ruche 04 jlm autonome
+  // ruche 05 jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(300);
@@ -927,7 +924,7 @@ void setup() {
   print_wakeup_reason();
 
   delay(500);
-  
+
   // toggle DONE HIGH to cut power with TPL5110
   digitalWrite(DONEPIN, HIGH); // enclenche l'arret du tpl5110
   delay(100);

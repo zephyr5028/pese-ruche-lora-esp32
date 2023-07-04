@@ -18,6 +18,7 @@
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 #define RUCHE_NUMERO  04      // numero de la ruche jlm4
+//#define RUCHE_NUMERO  05      // numero de la ruche jlm5
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -40,114 +41,122 @@
 // mettre a 0 pour avoir la valeur au demarrage de la balance sans charge
 // mettre ensuite la valeur retournee pour obtenir une tare fictive.
 #if RUCHE_NUMERO == 01
-// offset pour ruche jlm1 rfm95
-float calibration_factor = -20332;       // calibration factor avec valeur connue et tare a 0  -20332
+// pour ruche jlm1 rfm95
+float calibration_factor = -20332;       // calibration factor   -20332
 
 #elif RUCHE_NUMERO == 02
-// offset pour ruche jlm2 rfm95
-float calibration_factor = -20200;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+// pour ruche jlm2 rfm95
+float calibration_factor = -20200;       // calibration factor   -20200
 
 #elif RUCHE_NUMERO == 03
-// offset pour ruche jlm2 rfm95
-float calibration_factor = -20900;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+// pour ruche jlm3 rfm95
+float calibration_factor = -20900;       // calibration factor   -20900
 
 #elif RUCHE_NUMERO == 04
-// offset pour ruche jlm2 rfm95
-float calibration_factor = -20100;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+// pour ruche jlm4 rfm95
+float calibration_factor = -19900;       // calibration factor   -19900
+
+#elif RUCHE_NUMERO == 05
+// pour ruche jlm5 rfm95
+float calibration_factor = -19900;       // calibration factor    - 
 
 #elif RUCHE_NUMERO == 11
-// offset pour ruche loic1 rfm95
-float calibration_factor = -20100;       // calibration factor avec valeur connue et tare a 0  -20100
+// pour ruche loic1 rfm95
+float calibration_factor = -20100;       // calibration factor   -20100
 
 #elif RUCHE_NUMERO == 12
-// offset pour ruche loic2 rfm95
-float calibration_factor = -22100;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic2 rfm95
+float calibration_factor = -22100;       // calibration factor   -22100
 
 #elif RUCHE_NUMERO == 13
-// offset pour ruche loic3 rfm95
-float calibration_factor = -20800;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic3 rfm95
+float calibration_factor = -20800;       // calibration factor   -20800
 
 #elif RUCHE_NUMERO == 14
-// offset pour ruche loic4 rfm95
-float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic4 rfm95
+float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 15
-// offset pour ruche loic5 rfm95
-float calibration_factor = -20400;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic5 rfm95
+float calibration_factor = -20400;       // calibration factor   -20400
 
 #elif RUCHE_NUMERO == 16
-// offset pour ruche loic6 rfm95
-float calibration_factor = -22900;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic6 rfm95
+float calibration_factor = -22900;       // calibration factor   -22900
 
 #elif RUCHE_NUMERO == 17
-// offset pour ruche loic7 rfm95
-float calibration_factor = -19800;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic7 rfm95
+float calibration_factor = -19800;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 18
-// offset pour ruche loic8 rfm95
-float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic8 rfm95
+float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 19
-// offset pour ruche loic9 rfm95
-float calibration_factor = -20500;       // calibration factor avec valeur connue et tare a 0
+// pour ruche loic9 rfm95
+float calibration_factor = -20500;       // calibration factor   -20500
 #endif
 
 #if RUCHE_NUMERO == 01
-// offset pour ruche jlm1 rfm95
-const long LOADCELL_OFFSET = -104200;    // -104200
+// pour ruche jlm1 rfm95
+const long LOADCELL_OFFSET = -104200;    // offset    -104200
 
 #elif RUCHE_NUMERO == 02
-// offset pour ruche jlm2 rfm95
-const long LOADCELL_OFFSET = -38308;      // mesure faite a 19°C -38308
+// pour ruche jlm2 rfm95
+const long LOADCELL_OFFSET = -38308;      // offset  -38308
 
 #elif RUCHE_NUMERO == 03
-// offset pour ruche jlm3 rfm95
-const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
+// pour ruche jlm3 rfm95
+const long LOADCELL_OFFSET = -80400;      // offset  -80400
 
 #elif RUCHE_NUMERO == 04
-// offset pour ruche jlm4 rfm95
-const long LOADCELL_OFFSET = -112200;      // mesure faite a 19°C -80400
+// pour ruche jlm4 rfm95
+const long LOADCELL_OFFSET = -114050;      // offset -114050
+
+#elif RUCHE_NUMERO == 05
+// pour ruche jlm5 rfm95
+const long LOADCELL_OFFSET = -114050;      // offset -
 
 #elif RUCHE_NUMERO == 11
-// offset pour ruche loic1 rfm95
-const long LOADCELL_OFFSET = -22680;      // -22680
+// pour ruche loic1 rfm95
+const long LOADCELL_OFFSET = -22680;      // offset   -22680
 
 #elif RUCHE_NUMERO == 12
-// offset pour ruche loic2 rfm95
-const long LOADCELL_OFFSET = -125750;     // -125750
+// pour ruche loic2 rfm95
+const long LOADCELL_OFFSET = -125750;     // offset   -125750
 
 #elif RUCHE_NUMERO == 13
-// offset pour ruche loic3 rfm95
-const long LOADCELL_OFFSET = -82700;      // -82700
+// pour ruche loic3 rfm95
+const long LOADCELL_OFFSET = -82700;      // offset   -82700
 
 #elif RUCHE_NUMERO == 14
-// offset pour ruche loic4 rfm95
-const long LOADCELL_OFFSET = -95850;      // -95650
+// pour ruche loic4 rfm95
+const long LOADCELL_OFFSET = -95850;      // offset   -95650
 
 #elif RUCHE_NUMERO == 15
-// offset pour ruche loic5 rfm95
-const long LOADCELL_OFFSET = -139000;
+// pour ruche loic5 rfm95
+const long LOADCELL_OFFSET = -139000;     // offset   -139000
 
 #elif RUCHE_NUMERO == 16
-// offset pour ruche loic6 rfm95
-const long LOADCELL_OFFSET = -102500;
+// pour ruche loic6 rfm95
+const long LOADCELL_OFFSET = -102500;     // offset   -102500
 
 #elif RUCHE_NUMERO == 17
-// offset pour ruche loic7 rfm95
-const long LOADCELL_OFFSET = -86750;
+// pour ruche loic7 rfm95
+const long LOADCELL_OFFSET = -86750;      // offset   -86750
 
 #elif RUCHE_NUMERO == 18
-// offset pour ruche loic8 rfm95
-const long LOADCELL_OFFSET = -78300;
+// pour ruche loic8 rfm95
+const long LOADCELL_OFFSET = -78300;      // offset   -78300
 
 #elif RUCHE_NUMERO == 19
-// offset pour ruche loic9 rfm95
-const long LOADCELL_OFFSET = -95850;
+// pour ruche loic9 rfm95
+const long LOADCELL_OFFSET = -95850;      // offset   -95850
 #endif
 
 //const long LOADCELL_OFFSET = -102960;  // offset pour ruche 1 jlm sx1276 ttgo
 
-const int numberOfReadings = 5;
+const int numberOfReadings = 10;
 const int poidsAberrant = 12;      // test du poids aberrant pour relancer une mesure
 
 // Change sync word (0xF3) to match the receiver
@@ -171,6 +180,9 @@ byte synchroLora = 0xF3;
 
 #elif RUCHE_NUMERO == 04
 #define TIME_TO_SLEEP   313    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 05
+#define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
@@ -202,9 +214,9 @@ byte synchroLora = 0xF3;
 
 
 //----------------------
-// ruche 04 jlm autonome
+// ruche 05 jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 //==================================
 // structure de donnees des Capteurs
 //==================================
@@ -231,9 +243,9 @@ struct capteur_bme280 {
 #define tempsPause 30                                 // Nbre de secondes de pause (3600 = 1H00)
 #define SEALEVELPRESSURE_HPA (1013.25)                // pression au niveau de la mer, reference
 //----------------------
-// ruche 04 jlm autonome
+// ruche 05 jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 #define COMPENSATION -1.9                             // compensation de la valeur de temperature du bme280
 #else
 #define COMPENSATION -1.3                             // compensation de la valeur de temperature du bme280
@@ -283,6 +295,7 @@ int cad = 4095 ;                      // pas du convertisseur
 float tensionEsp32 = 3.3 ;            // tension de reference
 float tensionDiode = 0.74 ;           // correction tension de la diode de protection invertion 1n4007
 const int tensionAberrante = 3;       // test de le tension aberrante pour relancer une mesure
+const int numberOfReadingsBat = 20;   // nombre de lectures du port externe
 
 #if RUCHE_NUMERO == 01
 float correction = 0.15 ; // correction erreurs des resistances
@@ -294,6 +307,9 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 04
+float correction = -1.2; // correction erreurs des resistances
+
+#elif RUCHE_NUMERO == 05
 float correction = -0.35; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
