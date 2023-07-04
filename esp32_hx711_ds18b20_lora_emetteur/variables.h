@@ -53,7 +53,7 @@ float calibration_factor = -20900;       // calibration factor avec valeur connu
 
 #elif RUCHE_NUMERO == 04
 // offset pour ruche jlm2 rfm95
-float calibration_factor = -20900;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
+float calibration_factor = -20100;       // calibration factor avec valeur connue et tare a 0, 19°c  -20200
 
 #elif RUCHE_NUMERO == 11
 // offset pour ruche loic1 rfm95
@@ -106,7 +106,7 @@ const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
 
 #elif RUCHE_NUMERO == 04
 // offset pour ruche jlm4 rfm95
-const long LOADCELL_OFFSET = -80400;      // mesure faite a 19°C -80400
+const long LOADCELL_OFFSET = -112200;      // mesure faite a 19°C -80400
 
 #elif RUCHE_NUMERO == 11
 // offset pour ruche loic1 rfm95
@@ -265,6 +265,7 @@ const int temperatureAberrante = 6; //test de le temperature aberrante pour rela
 //====================
 //Battery calibration
 //====================
+/*
 // float analogReadReference  = 1.1 ; // reference theorique
 float offsetCalcule = 0.226;// offset mesure par voltmetre
 int R1 = 27000;   // resistance r1 du pont
@@ -273,6 +274,15 @@ int cad = 4095 ;  // pas du convertisseur
 float tensionEsp32 = 3.3 ; // tension de reference
 float tensionDiode = 0.74 ; // correction tension de la diode de protection invertion 1n4007
 const int tensionAberrante = 3; //test de le tension aberrante pour relancer une mesure
+*/
+// float analogReadReference  = 1.1 ; // reference theorique
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+int cad = 4095 ;                      // pas du convertisseur
+float tensionEsp32 = 3.3 ;            // tension de reference
+float tensionDiode = 0.74 ;           // correction tension de la diode de protection invertion 1n4007
+const int tensionAberrante = 3;       // test de le tension aberrante pour relancer une mesure
 
 #if RUCHE_NUMERO == 01
 float correction = 0.15 ; // correction erreurs des resistances
@@ -284,7 +294,7 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 04
-float correction = -0.25; // correction erreurs des resistances
+float correction = -0.35; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
 float correction = -0.35 ; // correction erreurs des resistances

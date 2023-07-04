@@ -793,6 +793,7 @@ void coupureEnergie () {
 // tension de la batterie
 //=======================
 float tensionBatterie() {
+  /*
   float voutBat = 0.0;
   int AnGpioResult = 0;
   // 10 mesures tension d'alimentation d'environ 12v
@@ -819,6 +820,14 @@ float tensionBatterie() {
 #else
   return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
 #endif
+*/
+ // mesure tension d'alimentation environ 12v
+  int AnGpioResult = analogRead(AnGpio);
+  // calcul du resultat en volt
+  float voutBat = ((AnGpioResult * tensionEsp32) / cad) + offsetCalcule;
+  // calcul de la tension en sortie du pont de resistance
+  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
+  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
 }
 
 //=======
