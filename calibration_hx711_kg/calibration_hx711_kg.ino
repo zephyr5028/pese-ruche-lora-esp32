@@ -43,16 +43,16 @@ float weight = 0;
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 0;                 // 1 = reglage calibration et 0 = reglage offset
-bool batterie = 1 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
+bool calibration = 0 ;                 // 1 = reglage calibration et 0 = reglage offset
+bool batterie = 0 ;                   // 1 = reglage de la correction batterie et 0 calibration / offset
+//#define BAT  12             // tension batterie 12v
+#define BAT  5                // tension batterie 5v
 
 // 1er : apres tare et offset a zero, placer une charge connue et regler
-float calibration_factor = -19900;
+float calibration_factor = -22500;
 
 // 2eme : enlever tare au demarrage puis regler offset (utiliser le zero factor disponible au demarrage)
-long LOADCELL_OFFSET = -114050;
-
-const int numberOfReadings = 20;
+long LOADCELL_OFFSET = 78950;
 
 //======================
 // tension alimentation
@@ -78,30 +78,51 @@ int  AnGpio = 35; // GPIO 35 is Now AN Input 1
 //====================
 // float analogReadReference  = 1.1 ; // reference theorique
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
+#if BAT == 12
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
+#elif BAT == 5 
+int R1 = 27000;                       // resistance r1 du pont
+int R2 = 10000;                       // resistance r2 du pont
+#endif
 int cad = 4095 ;                      // pas du convertisseur
 float tensionEsp32 = 3.3 ;            // tension de reference
 float tensionDiode = 0.74 ;           // correction tension de la diode de protection invertion 1n4007
 const int tensionAberrante = 3;       // test de le tension aberrante pour relancer une mesure
-float correction = -1.2 ;             // correction erreurs des resistances
+const int numberOfReadingsBat = 20;   // nombre de lectures du port externe
+
+float correction = -0.15 ;             // correction erreurs des resistances
 
 //==============
 // Read sensors
 //==============
 float tensionBatterie() {
   float voutBat = 0.0;
-  // 10 mesures tension d'alimentation d'environ 12v
-  for (int i = 0; i < numberOfReadings; i++) {
-    int AnGpioResult = analogRead(AnGpio);
+  int AnGpioResult = 0;
+  // mesures tension d'alimentation d'environ 12v
+  for (int i = 0; i < numberOfReadingsBat; i++) {
+    // The voltage measured is then assigned to a value between 0 and 4095
+    // in which 0 V corresponds to 0, and 3.3 V corresponds to 4095
+    AnGpioResult = analogRead(AnGpio);
     // calcul du resultat en volt
     voutBat = voutBat + (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
     delay(50);
   }
-  voutBat = voutBat / numberOfReadings;
+  voutBat = voutBat / numberOfReadingsBat;
+  Serial.print("tension mesuree adc : ");
+  Serial.println(AnGpioResult);
+  Serial.print("tension voutBat : ");
+  Serial.println(voutBat);
+  Serial.print("tension batterie : ");
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-  return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  if (BAT == 5) {
+    Serial.println(((voutBat * (R1 + R2)) / R2) + correction);       // batterie 5v
+    return ((voutBat * (R1 + R2)) / R2) + correction ;               // batterie 5v
+  } else if (BAT == 12 ) {
+    Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);  // batterie 12v
+    return ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;           // batterie 12v
+  }
 }
 
 void setup() {

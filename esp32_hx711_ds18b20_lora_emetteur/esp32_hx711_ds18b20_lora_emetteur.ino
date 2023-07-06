@@ -52,10 +52,11 @@
 #define CLK  25
 
 HX711 scale;  // objet scale
+
 //----------------------
-// ruche 05 jlm autonome
+// ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
 
@@ -76,7 +77,7 @@ struct ruche {
   int numRuche;  // numero de la ruche
   float poids;   // poids de la ruche
   float tempe;   // temperature de la ruche
-  float vBat;  // tension batterie
+  float vBat;    // tension batterie
 };
 
 // objet Ruche et control
@@ -119,9 +120,9 @@ byte data[12];
 byte addr[8];
 
 //----------------------
-// ruche 05 jlm autonome
+// ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
 //=========
 // BME280
 //=========
@@ -132,12 +133,14 @@ Adafruit_BME280 bme280;                                     // I2C
 // objets de donnees des Capteurs
 //==================================
 // objet capteurs et control
+
 boitierCapteur BoitierCapteur = {
   .numBoitierCapteur = BOITIER_CAPTEUR_NUMERO,
   .nameBoitierCapteur = NAME_BOITIER,
   .interrupteur = true,
   .tempeDS18B20 = 0.00,
-  .vBat = 0.00
+  .vBat = 0.00,
+  .poids = 0.00
 };
 
 // objet bme280
@@ -366,9 +369,47 @@ void startLoRA() {
 //===============================================
 void sendReadings() {
   //----------------------
-  // ruche 05 jlm autonome
+  // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO != 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+  // message a envoyer
+  LoRaMessage = String(counterID) +
+                "/" + String(BoitierCapteur.tempeDS18B20) +
+                "&" + String(BoitierCapteur.numBoitierCapteur) +
+                "#" + String(BoitierCapteur.poids) +
+                "{" + String(BoitierCapteur.vBat) +
+                "}" + Capteur_bme280.tempe +
+                "(" + Capteur_bme280.pression +
+                ")" + Capteur_bme280.humi +
+                "@" + BoitierCapteur.nameBoitierCapteur +
+                "~" + String(hum_stat) +
+                "^" + String(bar_for) +
+                "!" + String(BoitierCapteur.interrupteur);
+
+  String message = LoRaMessage;
+  //Send LoRa packet to receiver
+  LoRa.beginPacket();
+  LoRa.print(LoRaMessage);
+  LoRa.endPacket();
+  delay(1000);
+
+  Serial.print("Message LoRa envoye: ");
+  Serial.println(message);
+  Serial.print("Sending packet counterID : ");
+  Serial.println(counterID);
+  Serial.print("Temperature DS18B20: ");
+  Serial.print(BoitierCapteur.tempeDS18B20);
+  Serial.println(" °C");
+  Serial.print("Boitier capteur N°: ");
+  Serial.println(BoitierCapteur.numBoitierCapteur);
+  Serial.print("Temperature BME280: ");
+  Serial.println(Capteur_bme280.tempe);
+  Serial.print("tension d'alimentation : ");
+  Serial.print(BoitierCapteur.vBat, 2);
+  Serial.println(" V");
+  Serial.println();
+
+#else
   // message a envoyer
   LoRaMessage = String(readingID) +
                 "/" + String(Ruche.tempe) +
@@ -430,6 +471,7 @@ void sendReadings() {
   Serial.print(Ruche.vBat, 2);
   Serial.println(" V");
   //Serial.println();
+#endif
 
   delay(3000);
   // suivi chronologique de l'envoi des messages lora
@@ -437,44 +479,6 @@ void sendReadings() {
   if (readingID >= 10) {
     readingID =  0;
   }
-#elif RUCHE_NUMERO == 05
-  // message a envoyer
-  LoRaMessage = String(counterID) +
-                "/" + String(BoitierCapteur.tempeDS18B20) +
-                "&" + String(BoitierCapteur.numBoitierCapteur) +
-                "#" + String(BoitierCapteur.interrupteur) +
-                "{" + String(BoitierCapteur.vBat) +
-                "}" + Capteur_bme280.tempe +
-                "(" + Capteur_bme280.pression +
-                ")" + Capteur_bme280.humi +
-                "@" + BoitierCapteur.nameBoitierCapteur +
-                "~" + String(hum_stat) +
-                "^" + String(bar_for);
-
-  String message = LoRaMessage;
-  //Send LoRa packet to receiver
-  LoRa.beginPacket();
-  LoRa.print(LoRaMessage);
-  LoRa.endPacket();
-  delay(1000);
-
-  Serial.print("Message LoRa envoye: ");
-  Serial.println(message);
-  Serial.print("Sending packet counterID : ");
-  Serial.println(counterID);
-  Serial.print("Temperature DS18B20: ");
-  Serial.print(BoitierCapteur.tempeDS18B20);
-  Serial.println(" °C");
-  Serial.print("Boitier capteur N°: ");
-  Serial.println(BoitierCapteur.numBoitierCapteur);
-  Serial.print("Temperature BME280: ");
-  Serial.println(Capteur_bme280.tempe);
-  Serial.print("tension d'alimentation : ");
-  Serial.print(BoitierCapteur.vBat, 2);
-  Serial.println(" V");
-  Serial.println();
-#endif
-
 }
 
 //===============================================================
@@ -562,7 +566,11 @@ void getReadings() {
       Serial.println(F("Erreur de lecture du capteur"));
     }
   }
-#if RUCHE_NUMERO == 05
+
+  //----------------------
+  // ruche jlm autonome
+  //----------------------
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
   float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -579,15 +587,12 @@ void getReadings() {
       Serial.println(F("Erreur de lecture du capteur DS18B20"));
     }
   }
+  BoitierCapteur.poids = Ruche.poids;
+  // tension de la batterie
+  BoitierCapteur.vBat = tensionBatterie(); // pour un boitier capteur
 #endif
 
-  // calcul de la tension de la batterie
-  //----------------------
-  // ruche 05 jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 05
-  BoitierCapteur.vBat = tensionBatterie(); // pour un boitier capteur
-#else
+  // tension de la batterie
   Ruche.vBat = tensionBatterie();  // pour un boitier ruche
   /*
     delay(20);
@@ -598,8 +603,6 @@ void getReadings() {
     Ruche.vBat = tensionBatterie();
     }
   */
-#endif
-  delay(20);
 
   Serial.print("Weight: ");
   Serial.print(Ruche.poids, 3); //Up to 3 decimal points
@@ -616,9 +619,9 @@ void getReadings() {
 }
 
 //----------------------
-// ruche 05 jlm autonome
+// ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
 //=============
 // Read BME280
 //=============
@@ -795,7 +798,7 @@ void coupureEnergie () {
 float tensionBatterie() {
   float voutBat = 0.0;
   int AnGpioResult = 0;
-  // 10 mesures tension d'alimentation d'environ 12v
+  // mesures tension d'alimentation d'environ 12v
   for (int i = 0; i < numberOfReadingsBat; i++) {
     // The voltage measured is then assigned to a value between 0 and 4095
     // in which 0 V corresponds to 0, and 3.3 V corresponds to 4095
@@ -810,16 +813,19 @@ float tensionBatterie() {
   Serial.print("tension voutBat : ");
   Serial.println(voutBat);
   Serial.print("tension batterie : ");
-  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
+
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
+
   //----------------------
-  // ruche 05 jlm autonome
+  // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05
-  return ((voutBat * (R1 + R2)) / R2) + correction;
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+  Serial.println(((voutBat * (R1 + R2)) / R2) + correction);  // batterie 5v
+  return ((voutBat * (R1 + R2)) / R2) + correction;  // batterie 5v
 #else
-  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
+  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);  // batterie 12v
+  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode); // batterie 12v
 #endif
 }
 
@@ -870,9 +876,9 @@ void setup() {
   Serial.println(synchroLora);
 
   //----------------------
-  // ruche 05 jlm autonome
+  // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
   if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   } else {
@@ -893,9 +899,9 @@ void setup() {
   //digitalWrite(LED_BOARD, LOW);
 
   //----------------------
-  // ruche 05 jlm autonome
+  // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(300);
@@ -915,7 +921,7 @@ void setup() {
   //Increment boot number and print it every reboot
   ++bootCount;
   // suivi chronologique du wakeup
-  if (bootCount >= 10) {
+  if (bootCount >= 9) {
     bootCount =  0;
   }
   Serial.println("Boot number: " + String(bootCount));

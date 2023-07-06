@@ -17,8 +17,8 @@
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
-#define RUCHE_NUMERO  04      // numero de la ruche jlm4
-//#define RUCHE_NUMERO  05      // numero de la ruche jlm5
+//#define RUCHE_NUMERO  04      // numero de la ruche jlm4
+#define RUCHE_NUMERO  05      // numero de la ruche jlm5
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -40,6 +40,7 @@
 // Change this calibration factor as per your load cell once it is found you many need to vary it in thousands
 // mettre a 0 pour avoir la valeur au demarrage de la balance sans charge
 // mettre ensuite la valeur retournee pour obtenir une tare fictive.
+// calibration
 #if RUCHE_NUMERO == 01
 // pour ruche jlm1 rfm95
 float calibration_factor = -20332;       // calibration factor   -20332
@@ -58,7 +59,7 @@ float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-float calibration_factor = -19900;       // calibration factor    - 
+float calibration_factor = -22500;       // calibration factor    -22500 
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -97,6 +98,7 @@ float calibration_factor = -20500;       // calibration factor   -20500
 float calibration_factor = -20500;       // calibration factor   -20500
 #endif
 
+// offset
 #if RUCHE_NUMERO == 01
 // pour ruche jlm1 rfm95
 const long LOADCELL_OFFSET = -104200;    // offset    -104200
@@ -115,7 +117,7 @@ const long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-const long LOADCELL_OFFSET = -114050;      // offset -
+const long LOADCELL_OFFSET = 78950;      // offset -76850
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -153,8 +155,6 @@ const long LOADCELL_OFFSET = -78300;      // offset   -78300
 // pour ruche loic9 rfm95
 const long LOADCELL_OFFSET = -95850;      // offset   -95850
 #endif
-
-//const long LOADCELL_OFFSET = -102960;  // offset pour ruche 1 jlm sx1276 ttgo
 
 const int numberOfReadings = 10;
 const int poidsAberrant = 12;      // test du poids aberrant pour relancer une mesure
@@ -212,20 +212,22 @@ byte synchroLora = 0xF3;
 #define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
 #endif
 
-
 //----------------------
-// ruche 05 jlm autonome
+// ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
 //==================================
 // structure de donnees des Capteurs
 //==================================
+
 struct boitierCapteur {
   int numBoitierCapteur;     // numero du boitier
   String nameBoitierCapteur; // nom du boitier
   bool interrupteur;         // interrupteur
   float tempeDS18B20;        // temperature DS18B20
   float vBat;                // tension batterie
+  float poids;               // poids
+  
 };
 
 struct capteur_bme280 {
@@ -243,12 +245,12 @@ struct capteur_bme280 {
 #define tempsPause 30                                 // Nbre de secondes de pause (3600 = 1H00)
 #define SEALEVELPRESSURE_HPA (1013.25)                // pression au niveau de la mer, reference
 //----------------------
-// ruche 05 jlm autonome
+// ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05
-#define COMPENSATION -1.9                             // compensation de la valeur de temperature du bme280
-#else
-#define COMPENSATION -1.3                             // compensation de la valeur de temperature du bme280
+#if RUCHE_NUMERO == 04
+#define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
+#elif RUCHE_NUMERO == 05
+#define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #endif
 float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
 float hum = 0.0;                                      // Valeurs contenant la valeur d'humidite de la sonde bme280.
@@ -289,8 +291,18 @@ const int tensionAberrante = 3; //test de le tension aberrante pour relancer une
 */
 // float analogReadReference  = 1.1 ; // reference theorique
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
+//----------------------
+// ruche jlm autonome
+//----------------------
+// batterie 5v
+#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+int R1 = 27000;                       // resistance r1 du pont
+int R2 = 10000;                       // resistance r2 du pont
+// batterie 12v
+#else
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
+#endif
 int cad = 4095 ;                      // pas du convertisseur
 float tensionEsp32 = 3.3 ;            // tension de reference
 float tensionDiode = 0.74 ;           // correction tension de la diode de protection invertion 1n4007
@@ -307,10 +319,10 @@ float correction = -0.35 ; // correction erreurs des resistances
 float correction = -0.15 ; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 04
-float correction = -1.2; // correction erreurs des resistances
+float correction = -0.15; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 05
-float correction = -0.35; // correction erreurs des resistances
+float correction = -0.15; // correction erreurs des resistances
 
 #elif RUCHE_NUMERO == 11
 float correction = -0.35 ; // correction erreurs des resistances
