@@ -129,11 +129,11 @@ byte addr[8];
 Adafruit_BME280 bme280;                                     // I2C
 //Adafruit_BME280 bme(BME_CS);                              // hardware SPI
 //Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
+
 //==================================
 // objets de donnees des Capteurs
 //==================================
 // objet capteurs et control
-
 boitierCapteur BoitierCapteur = {
   .numBoitierCapteur = BOITIER_CAPTEUR_NUMERO,
   .nameBoitierCapteur = NAME_BOITIER,
@@ -358,10 +358,9 @@ void startLoRA() {
   // Change sync word (0xF3) to match the receiver
   // The sync word assures you don't get LoRa messages from other LoRa transceivers
   // ranges from 0-0xFF
-  //LoRa.setSyncWord(0xF3);
   LoRa.setSyncWord(synchroLora);
 
-  delay(2000);
+  delay(1000);
 }
 
 //===============================================
@@ -391,7 +390,7 @@ void sendReadings() {
   LoRa.beginPacket();
   LoRa.print(LoRaMessage);
   LoRa.endPacket();
-  delay(1000);
+  delay(200);
 
   Serial.print("Message LoRa envoye: ");
   Serial.println(message);
@@ -422,6 +421,24 @@ void sendReadings() {
   LoRa.beginPacket();
   LoRa.print(LoRaMessage);
   LoRa.endPacket();
+  delay(200);
+
+  Serial.print("Message LoRa envoye: ");
+  Serial.println(message);
+  Serial.print("Sending packet: ");
+  Serial.println(readingID);
+  Serial.print("Temperature: ");
+  Serial.print(Ruche.tempe);
+  Serial.println(" °C");
+  Serial.print("Ruche N°: ");
+  Serial.println(Ruche.numRuche);
+  Serial.print("Poids : ");
+  Serial.print(Ruche.poids);
+  Serial.println(" kg");
+  Serial.print("tension d'alimentation : ");
+  Serial.print(Ruche.vBat, 2);
+  Serial.println(" V");
+  //Serial.println();
 
 #if oled
   display.clearDisplay();
@@ -454,26 +471,9 @@ void sendReadings() {
   display.print(readingID);
   display.display();
 #endif
-
-  Serial.print("Message LoRa envoye: ");
-  Serial.println(message);
-  Serial.print("Sending packet: ");
-  Serial.println(readingID);
-  Serial.print("Temperature: ");
-  Serial.print(Ruche.tempe);
-  Serial.println(" °C");
-  Serial.print("Ruche N°: ");
-  Serial.println(Ruche.numRuche);
-  Serial.print("Poids : ");
-  Serial.print(Ruche.poids);
-  Serial.println(" kg");
-  Serial.print("tension d'alimentation : ");
-  Serial.print(Ruche.vBat, 2);
-  Serial.println(" V");
-  //Serial.println();
 #endif
 
-  delay(3000);
+  delay(1000);
   // suivi chronologique de l'envoi des messages lora
   ++readingID;
   if (readingID >= 10) {
@@ -576,13 +576,13 @@ void getReadings() {
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
     Serial.println(F("Erreur de lecture du capteur DS18B20"));
   }
-  delay(300);
+  delay(200);
   if (getTemperature(&BoitierCapteurControlTempeDS18B20, true) != READ_OK) {
     Serial.println(F("Erreur de lecture du capteur DS18B20"));
   }
   // test + ou - temperatureAberrante pour eviter les mesure aberrantes
   if ((BoitierCapteur.tempeDS18B20 > (BoitierCapteurControlTempeDS18B20 + temperatureAberrante)) or (BoitierCapteur.tempeDS18B20 < (BoitierCapteurControlTempeDS18B20 - temperatureAberrante))) {
-    delay(300);
+    delay(200);
     if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
       Serial.println(F("Erreur de lecture du capteur DS18B20"));
     }
@@ -798,16 +798,16 @@ void coupureEnergie () {
 float tensionBatterie() {
   float voutBat = 0.0;
   int AnGpioResult = 0;
-  // mesures tension d'alimentation d'environ 12v
+  // mesures tension d'alimentation
   for (int i = 0; i < numberOfReadingsBat; i++) {
     // The voltage measured is then assigned to a value between 0 and 4095
     // in which 0 V corresponds to 0, and 3.3 V corresponds to 4095
-    AnGpioResult = analogRead(AnGpio);
-    // calcul du resultat en volt
-    voutBat = voutBat + (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
+    AnGpioResult = AnGpioResult + analogRead(AnGpio);
     delay(50);
   }
-  voutBat = voutBat / numberOfReadingsBat;
+  AnGpioResult = AnGpioResult / numberOfReadingsBat; // resultat apres plusieurs mesures
+  // calcul du resultat en volt
+  voutBat = (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
   Serial.print("tension mesuree adc : ");
   Serial.println(AnGpioResult);
   Serial.print("tension voutBat : ");
@@ -815,18 +815,10 @@ float tensionBatterie() {
   Serial.print("tension batterie : ");
 
   // calcul de la tension en sortie du pont de resistance
-  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2. vBat correspond à la tension de la batterie
-
-  //----------------------
-  // ruche jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
-  Serial.println(((voutBat * (R1 + R2)) / R2) + correction);  // batterie 5v
-  return ((voutBat * (R1 + R2)) / R2) + correction;  // batterie 5v
-#else
-  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);  // batterie 12v
-  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode); // batterie 12v
-#endif
+  // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2
+  // voutBat correspond à la tension de la batterie
+  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
+  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
 }
 
 //=======
@@ -852,7 +844,7 @@ void setup() {
   // initialisation load cell
   scale.begin(DOUT, CLK);      // loadcell hx711 broches DOUT et CLK
   scale.power_down();          // put the ADC in sleep mode
-  delay(2500);
+  delay(3000);
   scale.power_up();            // reveil du hx711
   delay(500);
   scale.set_offset(LOADCELL_OFFSET);     // offset
@@ -892,7 +884,7 @@ void setup() {
 #endif
 
   Serial.println("Demarrage OK");
-  delay (300);
+  delay (200);
 
   //digitalWrite(LED_BOARD, HIGH); //allumage de la led de la carte
   getReadings();   // lecture des donnees
@@ -904,13 +896,13 @@ void setup() {
 #if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
   getSondes_bme280();  // bme280
   chaine_bme280();
-  delay(300);
+  delay(200);
   etatInterrupteur();  // etat de l'interrupteur
   coupureEnergie ();   // sauvegarde de counter_ID en cas de coupure de l'energie
 #endif
 
   sendReadings();      // envoi des donnees
-  delay(1000);
+  delay(500);
 
   scale.power_down();     // put the ADC du hx711 in sleep mode
   Serial.println("ADC HX711 Going to sleep mode now");
@@ -929,7 +921,7 @@ void setup() {
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
 
-  delay(500);
+  delay(300);
 
   // toggle DONE HIGH to cut power with TPL5110
   digitalWrite(DONEPIN, HIGH); // enclenche l'arret du tpl5110
