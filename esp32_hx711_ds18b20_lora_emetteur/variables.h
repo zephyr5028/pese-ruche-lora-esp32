@@ -68,7 +68,7 @@ float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-float calibration_factor = -21900;       // calibration factor    -21900
+float calibration_factor = -22100;       // calibration factor    -21900
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
 float calibration_factor = -20100;       // calibration factor   -20100
@@ -125,7 +125,7 @@ const long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-const long LOADCELL_OFFSET = 77785;        // offset 77785
+const long LOADCELL_OFFSET = 77200;        // offset 77785
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -281,9 +281,9 @@ const int temperatureAberrante = 6; //test de le temperature aberrante pour rela
 //====================
 int cad = 4095 ;                        // pas du convertisseur
 float tensionEsp32 = 3.3 ;              // tension de reference
-const int tensionAberrante = 3;         // test de le tension aberrante pour relancer une mesure
 const float numberOfReadingsBat = 10.0; // nombre de lectures du port externe
 // float analogReadReference  = 1.1 ;   // reference theorique
+float mesureTension = 0.0;
 
 #if RUCHE_NUMERO == 01
 // batterie 12v
@@ -292,6 +292,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = 0.15 ;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 02
 // batterie 12v
@@ -300,6 +302,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 03
 // batterie 12v
@@ -308,6 +312,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.15 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 04
 // batterie 5v
@@ -316,6 +322,8 @@ int R2 = 10000;                       // resistance r2 du pont
 float correction = -0.15;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
+const int tensionFaible = 3;          // tension faible
+const int tensionElevee = 7;         // tension elevee
 
 #elif RUCHE_NUMERO == 05
 // batterie 5v
@@ -324,6 +332,8 @@ int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
 float correction = 0.02;              // correction resistances - mesure en drv sans le tpl5110
 float tensionDiode = 0.20;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+const int tensionFaible = 3;          // tension faible
+const int tensionElevee = 7;         // tension elevee
 
 #elif RUCHE_NUMERO == 11
 // batterie 12v
@@ -332,6 +342,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 12
 // batterie 12v
@@ -340,6 +352,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 13
 // batterie 12v
@@ -348,6 +362,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 14
 // batterie 12v
@@ -356,6 +372,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 15
 // batterie 12v
@@ -364,6 +382,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 16
 // batterie 12v
@@ -372,6 +392,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.25 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 17
 // batterie 12v
@@ -380,6 +402,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = 0.35 ;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 18
 // batterie 12v
@@ -388,6 +412,8 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 19
 // batterie 12v
@@ -396,4 +422,6 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 #endif

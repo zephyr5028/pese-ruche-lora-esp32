@@ -35,9 +35,8 @@
 // HX711 circuit wiring
 #define DOUT  23
 #define CLK   25
-float weight = 0;
+float weight = 0.00;
 const int numberOfReadings = 10;
-const int poidsAberrant = 12;      // test du poids aberrant pour relancer une mesure
 
 // Change this calibration factor as per your load cell once it is found you many need to vary it in thousands
 // mettre a 0 pour avoir la valeur au demarrage de la balance sans charge
@@ -49,55 +48,55 @@ float calibration_factor = -20332;       // calibration factor   -20332
 
 #elif RUCHE_NUMERO == 02
 // pour ruche jlm2 rfm95
-long calibration_factor = -20200;       // calibration factor   -20200
+float calibration_factor = -20200;       // calibration factor   -20200
 
 #elif RUCHE_NUMERO == 03
 // pour ruche jlm3 rfm95
-long calibration_factor = -20900;       // calibration factor   -20900
+float calibration_factor = -20900;       // calibration factor   -20900
 
 #elif RUCHE_NUMERO == 04
 // pour ruche jlm4 rfm95
-long calibration_factor = -19900;       // calibration factor   -19900
+float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-long calibration_factor = -21900;       // calibration factor    -21900
+float calibration_factor = -22100;       // calibration factor    -22100
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
-long calibration_factor = -20100;       // calibration factor   -20100
+float calibration_factor = -20100;       // calibration factor   -20100
 
 #elif RUCHE_NUMERO == 12
 // pour ruche loic2 rfm95
-long calibration_factor = -22100;       // calibration factor   -22100
+float calibration_factor = -22100;       // calibration factor   -22100
 
 #elif RUCHE_NUMERO == 13
 // pour ruche loic3 rfm95
-long calibration_factor = -20800;       // calibration factor   -20800
+float calibration_factor = -20800;       // calibration factor   -20800
 
 #elif RUCHE_NUMERO == 14
 // pour ruche loic4 rfm95
-long calibration_factor = -20500;       // calibration factor   -20500
+float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 15
 // pour ruche loic5 rfm95
-long calibration_factor = -20400;       // calibration factor   -20400
+float calibration_factor = -20400;       // calibration factor   -20400
 
 #elif RUCHE_NUMERO == 16
 // pour ruche loic6 rfm95
-long calibration_factor = -22900;       // calibration factor   -22900
+float calibration_factor = -22900;       // calibration factor   -22900
 
 #elif RUCHE_NUMERO == 17
 // pour ruche loic7 rfm95
-long calibration_factor = -19800;       // calibration factor   -19800
+float calibration_factor = -19800;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 18
 // pour ruche loic8 rfm95
-long calibration_factor = -20500;       // calibration factor   -20500
+float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
-long calibration_factor = -20500;       // calibration factor   -20500
+float calibration_factor = -20500;       // calibration factor   -20500
 #endif
 
 // offset
@@ -119,7 +118,7 @@ long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-long LOADCELL_OFFSET = 77785;      // offset 77785
+long LOADCELL_OFFSET = 77200;       // offset 77200
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95

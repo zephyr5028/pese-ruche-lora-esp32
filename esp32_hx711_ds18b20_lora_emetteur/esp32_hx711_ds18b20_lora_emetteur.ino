@@ -589,20 +589,37 @@ void getReadings() {
   }
   BoitierCapteur.poids = Ruche.poids;
   // tension de la batterie
-  BoitierCapteur.vBat = tensionBatterie(); // pour un boitier capteur
+  mesureTension = tensionBatterie();
+  if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
+    BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+  } else {
+    delay(300);
+    mesureTension = tensionBatterie();
+    if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
+      BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+    } else {
+      delay(300);
+      mesureTension = tensionBatterie();
+      BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+    }
+  }
 #endif
 
   // tension de la batterie
-  Ruche.vBat = tensionBatterie();  // pour un boitier ruche
-  /*
-    delay(20);
-    RucheControl.vBat = tensionBatterie();  // control pour un boitier ruche
-    // test tension aberrante
-    if ((Ruche.vBat > (RucheControl.vBat + tensionAberrante)) or (Ruche.vBat < (RucheControl.vBat - tensionAberrante))) {
-    delay(20);
-    Ruche.vBat = tensionBatterie();
+  mesureTension = tensionBatterie();
+  if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
+    Ruche.vBat = mesureTension; // pour un boitier capteur
+  } else {
+    delay(300);
+    mesureTension = tensionBatterie();
+    if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
+      Ruche.vBat = mesureTension; // pour un boitier capteur
+    } else {
+      delay(300);
+      mesureTension = tensionBatterie();
+      Ruche.vBat = mesureTension; // pour un boitier capteur
     }
-  */
+  }
 
   Serial.print("Weight: ");
   Serial.print(Ruche.poids, 3); //Up to 3 decimal points
@@ -796,6 +813,7 @@ void coupureEnergie () {
 // tension de la batterie
 //=======================
 float tensionBatterie() {
+  float vBat = 0.0;
   float voutBat = 0.0;
   int AnGpioResult = 0;
   // mesures tension d'alimentation
@@ -817,8 +835,9 @@ float tensionBatterie() {
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2
   // voutBat correspond à la tension de la batterie
-  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
-  return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
+  vBat = ((voutBat * (R1 + R2)) / R2) + correction + tensionDiode;
+  Serial.println(vBat);
+  return (vBat);
 }
 
 //=======

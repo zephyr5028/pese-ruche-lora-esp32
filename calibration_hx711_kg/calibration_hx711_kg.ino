@@ -37,7 +37,7 @@ HX711 loadcell;   // objet loadcell
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 1 ;                 // 1 = reglage calibration et 0 = reglage offset
+bool calibration = 0 ;                 // 1 = reglage calibration et 0 = reglage offset
 bool batterie = 0 ;                    // 1 = reglage de la correction batterie et 0 calibration / offset
 //#define BAT  12             // tension batterie 12v
 #define BAT  5                // tension batterie 5v
@@ -64,7 +64,7 @@ float tensionBatterie() {
   AnGpioResult = AnGpioResult / numberOfReadingsBat; // resultat apres plusieurs mesures
   // calcul du resultat en volt
   voutBat = (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
-  Serial.print("tension mesuree adc : ");
+  Serial.print("tension mesuree DAC : ");
   Serial.println(AnGpioResult);
   Serial.print("tension voutBat : ");
   Serial.println(voutBat);
@@ -73,7 +73,7 @@ float tensionBatterie() {
   // calcul de la tension en sortie du pont de resistance
   // utilisation d'un pont de resistances : voutBat = vBat * R2 / R1 + R2
   // voutBat correspond à la tension de la batterie
-  Serial.println(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
+  Serial.print(((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
   return (((voutBat * (R1 + R2)) / R2) + correction + tensionDiode);
 }
 
@@ -81,7 +81,47 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   delay(300);
   pinMode(AnGpio, INPUT);         // anGpio lecture de la tension de la batterie
+  /*
+    Serial.println("HX711 Demo");
+    Serial.println("Initializing the scale");
+    //#define DOUT  23
+    //#define CLK   25
+    loadcell.begin(DOUT, CLK);
 
+    Serial.println("Before setting up the scale:");
+    Serial.print("read: \t\t");
+    Serial.println(loadcell.read());      // print a raw reading from the ADC
+
+    Serial.print("read average: \t\t");
+    Serial.println(loadcell.read_average(20));   // print the average of 20 readings from the ADC
+
+    Serial.print("get value: \t\t");
+    Serial.println(loadcell.get_value(5));   // print the average of 5 readings from the ADC minus the tare weight (not set yet)
+
+    Serial.print("get units: \t\t");
+    Serial.println(loadcell.get_units(5), 1);  // print the average of 5 readings from the ADC minus tare weight (not set) divided
+    // by the SCALE parameter (not set yet)
+
+    loadcell.set_scale(-459.542);
+    //loadcell.set_scale(-471.497);                      // this value is obtained by calibrating the scale with known weights; see the README for details
+    loadcell.tare();               // reset the scale to 0
+
+    Serial.println("After setting up the scale:");
+
+    Serial.print("read: \t\t");
+    Serial.println(loadcell.read());                 // print a raw reading from the ADC
+
+    Serial.print("read average: \t\t");
+    Serial.println(loadcell.read_average(20));       // print the average of 20 readings from the ADC
+
+    Serial.print("get value: \t\t");
+    Serial.println(loadcell.get_value(5));   // print the average of 5 readings from the ADC minus the tare weight, set with tare()
+
+    Serial.print("get units: \t\t");
+    Serial.println(loadcell.get_units(5), 1);        // print the average of 5 readings from the ADC minus tare weight, divided
+    // by the SCALE parameter set with set_scale
+    Serial.println("Readings:");
+  */
   Serial.println("");
   Serial.println("HX711 calibration sketch");
   Serial.println("Remove all weight from loadcell");
@@ -90,12 +130,14 @@ void setup() {
   Serial.println("Press - or z to decrease calibration factor or offset");
 
   loadcell.begin(DOUT, CLK);      // loadcell hx711 broches DOUT et CLK
+  delay(200);
   loadcell.power_down();          // put the ADC in sleep mode
-  delay(3000);
+  delay(2500);
   loadcell.power_up();            // reveil du hx711
   delay(500);
   loadcell.set_scale(calibration_factor);
   loadcell.set_offset(LOADCELL_OFFSET);
+  loadcell.set_gain(128); // channel A can be set for a 128 or 64 gain; channel B has a fixed 32 gain
   if (calibration) {
     loadcell.tare();               //Reset the scale to 0
   }
@@ -104,18 +146,27 @@ void setup() {
   //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
   Serial.print("Zero factor: ");
   Serial.println(zero_factor);
+
 }
 void loop() {
-  if (calibration) {
-    loadcell.set_scale(calibration_factor); //Adjust to this calibration factor
-  } else {
-    loadcell.set_offset(LOADCELL_OFFSET);   //adjust to this offset
-  }
-  delay(400);
+  delay(200);
   if (loadcell.is_ready()) {
-    weight = loadcell.get_units(10);
+    /*
+        Serial.print("one reading:\t");
+        Serial.print(loadcell.get_units(), 1);
+        Serial.print("\t| average:\t");
+        Serial.println(loadcell.get_units(10), 5);
+    */
+    if (calibration) {
+      loadcell.set_scale(calibration_factor); //Adjust to this calibration factor
+    } else {
+      loadcell.set_offset(LOADCELL_OFFSET);   //adjust to this offset
+    }
+    //weight = (loadcell.get_units(numberOfReadings),0.1);
+    weight = loadcell.get_units(numberOfReadings);
     //Change this to kg and re-adjust the calibration factor if you follow SI units like a sane person
     //Serial.print(" lbs");
+
   } else {
     Serial.println("HX711 not found.");
   }
@@ -127,11 +178,14 @@ void loop() {
   Serial.print(" / offset: ");
   Serial.print(LOADCELL_OFFSET);
   Serial.println("");
+  Serial.println("");
+  if (batterie) {
+    tensionBatterie();
+    Serial.print("   correction batterie = ");
+    Serial.print(correction);
+    Serial.println("");
+  }
 
-  Serial.print("tension batterie = ");
-  Serial.print(tensionBatterie());
-  Serial.print("   correction batterie = ");
-  Serial.println(correction);
   // reglages calibration / offset / corection batterie avec  + - a et z
   if (Serial.available())  {
     char temp = Serial.read();
