@@ -37,7 +37,7 @@ HX711 loadcell;   // objet loadcell
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 0 ;                 // 1 = reglage calibration et 0 = reglage offset
+bool calibration = 1 ;                 // 1 = reglage calibration et 0 = reglage offset
 bool batterie = 0 ;                    // 1 = reglage de la correction batterie et 0 calibration / offset
 //#define BAT  12             // tension batterie 12v
 #define BAT  5                // tension batterie 5v
@@ -122,6 +122,26 @@ void setup() {
     // by the SCALE parameter set with set_scale
     Serial.println("Readings:");
   */
+/*
+//On fait la lecture times fois et on retourne la moyenne de cette série de mesure
+long HX711::read_average(byte times) {
+	long sum = 0;
+	for (byte i = 0; i < times; i++) {
+		sum += read();
+	}
+	return sum / times;
+} 
+
+//On prend la moyenne de la mesure et on déduit le offset pour palier un décalage éventuel
+double HX711::get_value(byte times) {
+	return read_average(times) - OFFSET;
+}
+
+//Et ici on divise la moyenne de la série de mesure par ce fameux facteur de calibration (ici SCALE)
+float HX711::get_units(byte times) {
+	return get_value(times) / SCALE;
+}
+*/
   Serial.println("");
   Serial.println("HX711 calibration sketch");
   Serial.println("Remove all weight from loadcell");
