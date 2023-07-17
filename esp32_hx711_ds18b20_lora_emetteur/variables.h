@@ -7,8 +7,7 @@
 //Controls supression of the MonPrintf function to serial
 //=======================================================
 #define SERIAL_BAUD 115200    // vitesse moniteur serie
-#define SerialMonitor  1      // 1 true, 0 false
-#define debug 1               // true for use  Display log message if True
+#define SerialMonitor  0      // 1 true, 0 false
 #define oled  0               // oled 1 : afficheur present
 
 //=============
