@@ -7,7 +7,7 @@
 //Controls supression of the MonPrintf function to serial
 //=======================================================
 #define SERIAL_BAUD 115200    // vitesse moniteur serie
-#define SerialMonitor  0      // 1 true, 0 false
+#define SerialMonitor  1      // 1 true, 0 false
 #define oled  0               // oled 1 : afficheur present
 
 //=============
@@ -16,8 +16,9 @@
 //#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
-//#define RUCHE_NUMERO  04      // numero de la ruche jlm4
-#define RUCHE_NUMERO  05      // numero de la ruche jlm5
+#define RUCHE_NUMERO  04      // numero de la ruche jlm4
+//#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
+//#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -66,6 +67,10 @@ float calibration_factor = -20900;       // calibration factor   -20900
 float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
+// pour ruche jlm5 rfm95
+float calibration_factor = -22150;       // calibration factor    -22150
+
+#elif RUCHE_NUMERO == 06
 // pour ruche jlm5 rfm95
 float calibration_factor = -22150;       // calibration factor    -22150
 
@@ -127,6 +132,10 @@ const long LOADCELL_OFFSET = -114050;      // offset -114050
 // pour ruche jlm5 rfm95
 const long LOADCELL_OFFSET = 78400;        // offset 78400
 
+#elif RUCHE_NUMERO == 06
+// pour ruche jlm5 rfm95
+const long LOADCELL_OFFSET = 78400;        // offset 78400
+
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
 const long LOADCELL_OFFSET = -22680;      // offset   -22680
@@ -184,6 +193,9 @@ const long LOADCELL_OFFSET = -95850;      // offset   -95850
 #elif RUCHE_NUMERO == 05
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
 
+#elif RUCHE_NUMERO == 06
+#define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
+
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
 
@@ -215,7 +227,7 @@ const long LOADCELL_OFFSET = -95850;      // offset   -95850
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
 //==================================
 // structure de donnees des Capteurs
 //==================================
@@ -247,9 +259,9 @@ struct capteur_bme280 {
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04
+#if RUCHE_NUMERO == 05
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
-#elif RUCHE_NUMERO == 05
+#elif RUCHE_NUMERO == 06
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #endif
 float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
@@ -316,14 +328,14 @@ const int tensionFaible = 10;         // tension faible
 const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 04
-// batterie 5v
-int R1 = 27000;                       // resistance r1 du pont
-int R2 = 10000;                       // resistance r2 du pont
-float correction = -0.15;             // correction
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -0.35 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
-float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
-const int tensionFaible = 3;          // tension faible
-const int tensionElevee = 7;         // tension elevee
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 05
 // batterie 5v
@@ -332,6 +344,16 @@ int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
 float correction = 0.02;              // correction resistances - mesure en drv sans le tpl5110
 float tensionDiode = 0.20;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+const int tensionFaible = 3;          // tension faible
+const int tensionElevee = 7;         // tension elevee
+
+#elif RUCHE_NUMERO == 06
+// batterie 5v
+int R1 = 27000;                       // resistance r1 du pont
+int R2 = 10000;                       // resistance r2 du pont
+float correction = -0.15;             // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
 const int tensionFaible = 3;          // tension faible
 const int tensionElevee = 7;         // tension elevee
 

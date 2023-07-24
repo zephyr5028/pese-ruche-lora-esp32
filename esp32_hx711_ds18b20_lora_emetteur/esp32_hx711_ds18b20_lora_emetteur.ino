@@ -56,7 +56,7 @@ HX711 scale;  // objet scale
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
 
@@ -122,7 +122,7 @@ byte addr[8];
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
 //=========
 // BME280
 //=========
@@ -378,7 +378,7 @@ void sendReadings() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
   // message a envoyer
   LoRaMessage = String(counterID) +
                 "/" + String(BoitierCapteur.tempeDS18B20) +
@@ -559,7 +559,7 @@ void getReadings() {
   RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
   // test + ou - poidsAberrant pour eviter les mesure aberrantes
   if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
-    delay(100);
+    delay(200);
     Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
   } else {
     delay(300);
@@ -567,7 +567,7 @@ void getReadings() {
     delay(300);
     Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
     if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
-      delay(100);
+      delay(200);
       Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
     } else {
       delay(300);
@@ -605,7 +605,7 @@ void getReadings() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
   float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -689,7 +689,7 @@ void getReadings() {
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
 //=============
 // Read BME280
 //=============
@@ -857,7 +857,7 @@ void coupureEnergie () {
   // Close the Preferences
   preferences.end();
 
-  if (counterID >= 10) {
+  if (counterID >= 9) {
     if (SerialMonitor) {
       Serial.println("passage dans la boucle");
     }
@@ -957,7 +957,7 @@ void setup() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
   if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
     if (SerialMonitor) {
       Serial.println("Could not find a valid BME280 sensor, check wiring!");
@@ -984,7 +984,7 @@ void setup() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 04 or RUCHE_NUMERO == 05
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(100);
