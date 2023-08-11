@@ -5,6 +5,15 @@
 #define SerialMonitor   1
 #define debug 1  // true for use Display log message if True
 
+//===========================
+//Restart ESP32 after a while
+//===========================
+unsigned long resetAfterMillis = 86400000 ;  // 24h
+//unsigned long resetAfterMillis = 43200000; // 12h
+//unsigned long resetAfterMillis = 60000 ;   // 1 minute
+unsigned long lastResetWas;
+
+
 //==========================
 //Enable Blynk or Thingspeak
 //==========================

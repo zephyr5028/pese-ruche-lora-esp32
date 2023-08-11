@@ -638,6 +638,9 @@ void notFound(AsyncWebServerRequest * request) {
 void setup() {
   // Initialize Serial Monitor
   Serial.begin(SERIAL_BAUD);
+
+  lastResetWas = millis(); // pour reset esp32 intervals reguliers
+
   startOLED();
   delay(2000);
   startLoRA();
@@ -809,6 +812,14 @@ void loop() {
       }
     }
 #endif
+  }
+
+  // reset esp32 intervals reguliers
+  unsigned long ceMoment = millis();  // now
+  if (ceMoment >= (lastResetWas + ResetAfterMillis)) {
+    lastResetWas = ceMoment;
+    delay(20);
+    ESP.restart();
   }
 }
 
