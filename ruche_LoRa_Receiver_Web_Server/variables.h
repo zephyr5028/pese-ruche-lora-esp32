@@ -13,7 +13,6 @@ unsigned long resetAfterMillis = 86400000 ;  // 24h
 //unsigned long resetAfterMillis = 60000 ;   // 1 minute
 unsigned long lastResetWas;
 
-
 //==========================
 //Enable Blynk or Thingspeak
 //==========================
