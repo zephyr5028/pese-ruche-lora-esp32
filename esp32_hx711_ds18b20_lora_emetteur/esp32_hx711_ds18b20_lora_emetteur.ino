@@ -19,8 +19,8 @@
 //=============================
 // inclusion des bibliothèques
 //=============================
-#include "variables.h" // fichier variables
-#include "secrets.h"   // fichier secrets
+#include "variables.h"  // fichier variables
+#include "secrets.h"    // fichier secrets
 
 // bibliotheque load cell hx711
 #include "HX711.h"
@@ -34,7 +34,7 @@
 //#include "soc/rtc.h"
 
 //Libraries for DS18B20
-#include <OneWire.h>       //Librairie du bus OneWire
+#include <OneWire.h>  //Librairie du bus OneWire
 //#include <DallasTemperature.h>
 
 //Libraries for LoRa
@@ -50,8 +50,8 @@
 #endif
 
 // HX711 circuit wiring
-#define DOUT  23
-#define CLK  25
+#define DOUT 23
+#define CLK 25
 
 HX711 scale;  // objet scale
 
@@ -83,8 +83,8 @@ struct ruche {
 };
 
 // objet Ruche et control
-ruche Ruche = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .vBat = 0.00 }; // definition de la ruche
-ruche RucheControl = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .vBat = 0.00 }; // definition de la ruche control
+ruche Ruche = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .vBat = 0.00 };         // definition de la ruche
+ruche RucheControl = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .vBat = 0.00 };  // definition de la ruche control
 
 //=========
 // DB18B20
@@ -100,9 +100,9 @@ ruche RucheControl = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .
   DallasTemperature sensors(&oneWire);
 */
 // Broche du bus 1-Wire pour la sonde temperature ds18b20
-#define ONEWIRE_BUS 17               // Pin de connexion des sondes DS18B20
-#define TEMPERATURE_PRECISION 12     // precision convertisseur ad du ds18b20 (9 à 12)
-const int DS18B20_ID = 0x28;         // debut de l'adresse d'une sonde ds18b20
+#define ONEWIRE_BUS 17            // Pin de connexion des sondes DS18B20
+#define TEMPERATURE_PRECISION 12  // precision convertisseur ad du ds18b20 (9 à 12)
+const int DS18B20_ID = 0x28;      // debut de l'adresse d'une sonde ds18b20
 
 // Code de retour de la fonction getTemperature()
 enum DS18B20_RCODES {
@@ -128,7 +128,7 @@ byte addr[8];
 //=========
 // BME280
 //=========
-Adafruit_BME280 bme280;                                     // I2C
+Adafruit_BME280 bme280;  // I2C
 //Adafruit_BME280 bme(BME_CS);                              // hardware SPI
 //Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
@@ -160,7 +160,7 @@ capteur_bme280 Capteur_bme280 = {
 //=======
 // Button
 //=======
-Button interrupteur (33);   // contacteur gpio33
+Button interrupteur(33);  // contacteur gpio33
 #endif
 
 //================================================================
@@ -182,7 +182,7 @@ Button interrupteur (33);   // contacteur gpio33
 //#define BAND 866E6
 #define BAND 868300000
 
-int txPower = 20; // power of tx lora 17 par default (2 to 20)
+int txPower = 20;  // power of tx lora 17 par default (2 to 20)
 #define PABOOST true
 
 #if oled
@@ -192,8 +192,8 @@ int txPower = 20; // power of tx lora 17 par default (2 to 20)
 #define OLED_SDA 4
 #define OLED_SCL 15
 #define OLED_RST 16
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  // OLED display height, in pixels
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
 #endif
@@ -222,7 +222,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
 
 #define uS_TO_S_FACTOR 1000000  // Conversion factor for micro seconds to seconds
 
-RTC_DATA_ATTR int bootCount = 0;   // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
+RTC_DATA_ATTR int bootCount = 0;  // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
 
 //===========================================
 //Method to print the reason by which ESP32
@@ -233,19 +233,18 @@ void print_wakeup_reason() {
 
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  switch (wakeup_reason)
-  {
-    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
-    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
-    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
-    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason); break;
+  switch (wakeup_reason) {
+    case ESP_SLEEP_WAKEUP_EXT0: Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1: Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER: Serial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD: Serial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP: Serial.println("Wakeup caused by ULP program"); break;
+    default: Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason); break;
   }
 }
 
 // packet counter
-RTC_DATA_ATTR  int readingID = 0; // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
+RTC_DATA_ATTR int readingID = 0;  // sauvegarde de la variable avant le mode sleep dans la memoire rtc de l'esp32
 unsigned int counterID = 0;       // compteur ID
 int counter = 0;                  // compteur
 String LoRaMessage = "";          // message lora avant envoi
@@ -268,7 +267,7 @@ long lastMsg = 0;
   and 3.3 V corresponds to 4095
 */
 // mesure tension alimentation 12v
-int  AnGpio = 35; // GPIO 35 is Now AN Input 1
+int AnGpio = 35;  // GPIO 35 is Now AN Input 1
 
 //=====
 // led
@@ -288,11 +287,12 @@ void startOLED() {
 
   //initialize OLED
   Wire.begin(OLED_SDA, OLED_SCL);
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) {    // Address 0x3C for 128x32
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) {  // Address 0x3C for 128x32
     if (SerialMonitor) {
       Serial.println(F("SSD1306 allocation failed"));
     }
-    for (;;);     // Don't proceed, loop forever
+    for (;;)
+      ;  // Don't proceed, loop forever
   }
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -334,7 +334,7 @@ void startLoRA() {
     // chaque demarrage de la radio; activation dans le CRC
     //LoRa.enableCrc();
     //Facteur d’etalement (SF) : De 6 à 12, plus la valeur est grande, plus la portee est grande
-    LoRa.setSpreadingFactor(10);       // Setup Spreading Factor (6 ~ 12)
+    LoRa.setSpreadingFactor(10);  // Setup Spreading Factor (6 ~ 12)
     // Setup BandWidth, option: 7800,10400,15600,20800,31250,41700,62500,125000,250000,500000
     LoRa.setSignalBandwidth(125000);
     //LoRa.setCodingRate4(8);          // Setup Coding Rate:5(4/5),6(4/6),7(4/7),8(4/8)
@@ -382,18 +382,7 @@ void sendReadings() {
   //----------------------
 #if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
   // message a envoyer
-  LoRaMessage = String(counterID) +
-                "/" + String(BoitierCapteur.tempeDS18B20) +
-                "&" + String(BoitierCapteur.numBoitierCapteur) +
-                "#" + String(BoitierCapteur.poids) +
-                "{" + String(BoitierCapteur.vBat) +
-                "}" + Capteur_bme280.tempe +
-                "(" + Capteur_bme280.pression +
-                ")" + Capteur_bme280.humi +
-                "@" + BoitierCapteur.nameBoitierCapteur +
-                "~" + String(hum_stat) +
-                "^" + String(bar_for) +
-                "!" + String(BoitierCapteur.interrupteur);
+  LoRaMessage = String(counterID) + "/" + String(BoitierCapteur.tempeDS18B20) + "&" + String(BoitierCapteur.numBoitierCapteur) + "#" + String(BoitierCapteur.poids) + "{" + String(BoitierCapteur.vBat) + "}" + Capteur_bme280.tempe + "(" + Capteur_bme280.pression + ")" + Capteur_bme280.humi + "@" + BoitierCapteur.nameBoitierCapteur + "~" + String(hum_stat) + "^" + String(bar_for) + "!" + String(BoitierCapteur.interrupteur);
 
   String message = LoRaMessage;
   //Send LoRa packet to receiver
@@ -421,11 +410,7 @@ void sendReadings() {
 
 #else
   // message a envoyer
-  LoRaMessage = String(readingID) +
-                "/" + String(Ruche.tempe) +
-                "&" + String(Ruche.numRuche) +
-                "#" + String(Ruche.poids) +
-                "{" + String(Ruche.vBat);
+  LoRaMessage = String(readingID) + "/" + String(Ruche.tempe) + "&" + String(Ruche.numRuche) + "#" + String(Ruche.poids) + "{" + String(Ruche.vBat);
 
   String message = LoRaMessage;
   //Send LoRa packet to receiver
@@ -489,7 +474,7 @@ void sendReadings() {
   // suivi chronologique de l'envoi des messages lora
   ++readingID;
   if (readingID >= 10) {
-    readingID =  0;
+    readingID = 0;
   }
 }
 
@@ -544,7 +529,7 @@ byte getTemperature(float *temperature, byte reset_search) {
   // Serial.println(addr[0]); // premier octet adresse du ds18b20 : 40 en decimal, 28 hexa
 
   // Calcul de la temperature en degre Celsius
-  *temperature = (int16_t) ((data[1] << 8) | data[0]) * 0.0625;
+  *temperature = (int16_t)((data[1] << 8) | data[0]) * 0.0625;
 
   // Pas d'erreur
   return READ_OK;
@@ -555,15 +540,18 @@ byte getTemperature(float *temperature, byte reset_search) {
 //==============
 void getReadings() {
   // lecture du poids de la ruche
-  delay(200);
-  Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-  delay(300);
-  RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+  delay(100);
+  Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
+  //delay(300);
+  //RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+
   // test + ou - poidsAberrant pour eviter les mesure aberrantes
-  if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
+  //if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
+  if ((Ruche.poids > (Ruche.poids + poidsAberrant)) or (Ruche.poids < (Ruche.poids - poidsAberrant))) {
     delay(200);
-    Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-  } else {
+    Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
+  }
+  /* else {
     delay(300);
     RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
     delay(300);
@@ -576,26 +564,33 @@ void getReadings() {
       Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
     }
   }
+  */
+
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&Ruche.tempe, true) != READ_OK) {
     if (SerialMonitor) {
       Serial.println(F("Erreur de lecture du capteur"));
     }
   }
+  /*
   delay(300);
   if (getTemperature(&RucheControl.tempe, true) != READ_OK) {
     if (SerialMonitor) {
       Serial.println(F("Erreur de lecture du capteur"));
     }
   }
+  */
+
   delay(100);
   // test + ou - temperatureAberrante pour eviter les mesure aberrantes
-  if ((Ruche.tempe > (RucheControl.tempe + temperatureAberrante)) or (Ruche.tempe < (RucheControl.tempe - temperatureAberrante))) {
+  //if ((Ruche.tempe > (RucheControl.tempe + temperatureAberrante)) or (Ruche.tempe < (RucheControl.tempe - temperatureAberrante))) {
+  if ((Ruche.tempe > (Ruche.tempe + temperatureAberrante)) or (Ruche.tempe < (Ruche.tempe - temperatureAberrante))) {
     if (getTemperature(&Ruche.tempe, true) != READ_OK) {
       if (SerialMonitor) {
         Serial.println(F("Erreur de lecture du capteur"));
       }
-    } else {
+    }
+    /* else {
       delay(300);
       if (getTemperature(&Ruche.tempe, true) != READ_OK) {
         if (SerialMonitor) {
@@ -603,12 +598,14 @@ void getReadings() {
         }
       }
     }
+    */
   }
+
   //----------------------
   // ruche jlm autonome
   //----------------------
 #if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
-  float BoitierCapteurControlTempeDS18B20 = 0.0; // si temperature aberrante
+  float BoitierCapteurControlTempeDS18B20 = 0.0;  // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
     if (SerialMonitor) {
@@ -641,16 +638,16 @@ void getReadings() {
   // tension de la batterie
   mesureTension = tensionBatterie();
   if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
-    BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+    BoitierCapteur.vBat = mesureTension;  // pour un boitier capteur
   } else {
     delay(300);
     mesureTension = tensionBatterie();
     if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
-      BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+      BoitierCapteur.vBat = mesureTension;  // pour un boitier capteur
     } else {
       delay(300);
       mesureTension = tensionBatterie();
-      BoitierCapteur.vBat = mesureTension; // pour un boitier capteur
+      BoitierCapteur.vBat = mesureTension;  // pour un boitier capteur
     }
   }
 #endif
@@ -658,22 +655,26 @@ void getReadings() {
   // tension de la batterie
   mesureTension = tensionBatterie();
   if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
-    Ruche.vBat = mesureTension; // pour un boitier capteur
+    Ruche.vBat = mesureTension;  // pour un boitier capteur
   } else {
     delay(300);
     mesureTension = tensionBatterie();
+    Ruche.vBat = mesureTension;  // pour un boitier capteur
+    /*
     if (mesureTension > tensionFaible and mesureTension < tensionElevee) {
-      Ruche.vBat = mesureTension; // pour un boitier capteur
+      Ruche.vBat = mesureTension;  // pour un boitier capteur
     } else {
       delay(300);
       mesureTension = tensionBatterie();
-      Ruche.vBat = mesureTension; // pour un boitier capteur
+      Ruche.vBat = mesureTension;  // pour un boitier capteur
     }
+    */
   }
+
   if (SerialMonitor) {
     Serial.print("Weight: ");
-    Serial.print(Ruche.poids, 3); //Up to 3 decimal points
-    Serial.println(" kg"); //Change this to kg and re-adjust the calibration factor if you follow lbs
+    Serial.print(Ruche.poids, 3);  //Up to 3 decimal points
+    Serial.println(" kg");         //Change this to kg and re-adjust the calibration factor if you follow lbs
   }
 
   // sur le moniteur serie
@@ -684,7 +685,7 @@ void getReadings() {
   if (Serial.available()) {
     char temporaire = Serial.read();
     //if (temporaire == 't' || temporaire == 'T') scale.tare(); //Reset the scale to zero
-    if (temporaire == 't') scale.tare();    //Reset the scale to zero
+    if (temporaire == 't') scale.tare();  //Reset the scale to zero
   }
 }
 
@@ -697,13 +698,13 @@ void getReadings() {
 //=============
 // BME280
 void getSondes_bme280() {
-  temp = bme280.readTemperature(); //lecture de la temperature
-  Capteur_bme280.tempe = String(temp, 2); // convert float to string avec 2 decimal apres la virgule
-  delay(100); // pause 100ms
+  temp = bme280.readTemperature();         //lecture de la temperature
+  Capteur_bme280.tempe = String(temp, 2);  // convert float to string avec 2 decimal apres la virgule
+  delay(100);                              // pause 100ms
 
-  hum = bme280.readHumidity();  // lecture de l'humidite
-  Capteur_bme280.humi = String(hum, 0); // convert float to string avec 0 decimal apres la virgule
-  delay(100); // pause 100ms
+  hum = bme280.readHumidity();           // lecture de l'humidite
+  Capteur_bme280.humi = String(hum, 0);  // convert float to string avec 0 decimal apres la virgule
+  delay(100);                            // pause 100ms
   // Si vous écrivez :
   //float pressure = .01 * bme280.getPressure() ;
   //Serial.print (pressure , 2) ;
@@ -717,10 +718,10 @@ void getSondes_bme280() {
 
   //Valeur retenue = (Valeur lue * coefficient multiplicateur) + offset
   //Suivant les cartes, coefficients multiplicateurs entre .99 et 1.1 et offsets de +/- 3 hPa
-  pre = (pre * 1.0) + 2; // correction de la lecture de la pression en fonction du composant
-  delay(100); // pause 100ms
+  pre = (pre * 1.0) + 2;                            // correction de la lecture de la pression en fonction du composant
+  delay(100);                                       // pause 100ms
   pre = bme280.seaLevelForAltitude(ALTITUDE, pre);  // pression calculee
-  Capteur_bme280.pression = String(pre, 0); // convert float string avec 0 decimal apres la virgule
+  Capteur_bme280.pression = String(pre, 0);         // convert float string avec 0 decimal apres la virgule
   //float alt = bme.readAltitude(SEALEVELPRESSURE_HPA);  // altitude du lieu calcule
   //Forecast: 0 None, 1 Sunny, 2 PartlyCloudy, 3 Cloudy, 4 Rain
   //-(altitude / 8) pour la correction due a l'atltitude !!!
@@ -728,16 +729,16 @@ void getSondes_bme280() {
   // Forecast: 0 - None, 1 - Sunny, 2 - PartlyCloudy, 3 - Cloudy, 4 - Rain, de la sonde bme280
   bar_for = 0;
   if (pre < 1006) {
-    bar_for = 4; // rain
+    bar_for = 4;  // rain
     Capteur_bme280.bar_for = "rain";
-  } else if ((pre >= 1006 ) & (pre < 1013 )) {
-    bar_for = 3; // cloudy
+  } else if ((pre >= 1006) & (pre < 1013)) {
+    bar_for = 3;  // cloudy
     Capteur_bme280.bar_for = "cloudy";
-  } else if ((pre >= 1013 ) & (pre < 1020 )) {
-    bar_for = 2; // Partly Cloudy
+  } else if ((pre >= 1013) & (pre < 1020)) {
+    bar_for = 2;  // Partly Cloudy
     Capteur_bme280.bar_for = "partly cloudy";
-  } else if (pre >= 1020 ) {
-    bar_for = 1; // wet / sunny
+  } else if (pre >= 1020) {
+    bar_for = 1;  // wet / sunny
     Capteur_bme280.bar_for = "wet sunny";
   } else {
     bar_for = 0;  // none
@@ -747,16 +748,16 @@ void getSondes_bme280() {
   // Humidity status: 0 Normal, 1 Comfort, 2 Dry, 3 Wet
   hum_stat = 0;
   if (hum < 30) {
-    hum_stat = 2; // dry
+    hum_stat = 2;  // dry
     Capteur_bme280.hum_stat = "dry";
   } else if ((hum >= 30) & (hum < 45)) {
-    hum_stat = 0; // normal
+    hum_stat = 0;  // normal
     Capteur_bme280.hum_stat = "normal";
   } else if ((hum >= 45) & (hum < 70)) {
-    hum_stat = 1; // confort
+    hum_stat = 1;  // confort
     Capteur_bme280.hum_stat = "comfort";
   } else if (hum >= 70) {
-    hum_stat = 3; // humide
+    hum_stat = 3;  // humide
     Capteur_bme280.hum_stat = "wet";
   }
 
@@ -775,7 +776,7 @@ void getSondes_bme280() {
     Serial.println(Capteur_bme280.bar_for);
     Serial.print("humidite_status_BME280 : ");
     Serial.println(Capteur_bme280.hum_stat);
-    Serial.print("altitude du lieu : "); // pour les calculs avec la sonde bme280
+    Serial.print("altitude du lieu : ");  // pour les calculs avec la sonde bme280
     Serial.println(ALTITUDE);
   }
 }
@@ -783,23 +784,23 @@ void getSondes_bme280() {
 // chaine pour l'envoi des valeurs de la sonde BME280
 void chaine_bme280() {
   // Convert the value to a char array
-  char valeur_temp[6] = ""; // temperature
+  char valeur_temp[6] = "";  // temperature
   dtostrf(temp, 2, 2, valeur_temp);
   strcat(chaine, valeur_temp);
   strcat(chaine, ";");
-  char valeur_hum[5] = ""; // humidite
+  char valeur_hum[5] = "";  // humidite
   dtostrf(hum, 2, 2, valeur_hum);
   strcat(chaine, valeur_hum);
   strcat(chaine, ";");
-  char valeur_hum_stat[1] = ""; // humidite confort
+  char valeur_hum_stat[1] = "";  // humidite confort
   dtostrf(hum_stat, 1, 0, valeur_hum_stat);
   strcat(chaine, valeur_hum_stat);
   strcat(chaine, ";");
-  char valeur_pre[6] = ""; // pression barometrique
+  char valeur_pre[6] = "";  // pression barometrique
   dtostrf(pre, 4, 0, valeur_pre);
   strcat(chaine, valeur_pre);
   strcat(chaine, ";");
-  char valeur_bar_for[1] = ""; // prevision meteo avec le barometre
+  char valeur_bar_for[1] = "";  // prevision meteo avec le barometre
   dtostrf(bar_for, 1, 0, valeur_bar_for);
   strcat(chaine, valeur_bar_for);
   if (SerialMonitor) {
@@ -828,7 +829,7 @@ void etatInterrupteur() {
 //============================================
 // memorisation en cas de coupure de l'energie
 //============================================
-void coupureEnergie () {
+void coupureEnergie() {
   // Open Preferences with my-app namespace. Each application module, library, etc
   // has to use a namespace name to prevent key name collisions. We will open storage in
   // RW-mode (second parameter has to be false).
@@ -887,7 +888,7 @@ float tensionBatterie() {
     //Serial.print(" gpio   : ");
     //Serial.println(AnGpioResult);
   }
-  AnGpioResult = AnGpioResult / numberOfReadingsBat; // resultat apres plusieurs mesures
+  AnGpioResult = AnGpioResult / numberOfReadingsBat;  // resultat apres plusieurs mesures
   // calcul du resultat en volt
   voutBat = (((AnGpioResult * tensionEsp32) / cad) + offsetCalcule);
   if (SerialMonitor) {
@@ -917,7 +918,7 @@ void setup() {
   digitalWrite(DONEPIN, LOW);
 
   Serial.begin(SERIAL_BAUD);
-  pinMode(AnGpio, INPUT); // anGpio lecture de la tension de la batterie
+  pinMode(AnGpio, INPUT);  // anGpio lecture de la tension de la batterie
   //pinMode(LED_BOARD,OUTPUT); // led de la carte
   /*
     // Start up the library
@@ -929,13 +930,13 @@ void setup() {
   */
 
   // initialisation load cell
-  scale.begin(DOUT, CLK);      // loadcell hx711 broches DOUT et CLK
-  scale.power_down();          // put the ADC in sleep mode
+  scale.begin(DOUT, CLK);  // loadcell hx711 broches DOUT et CLK
+  scale.power_down();      // put the ADC in sleep mode
   delay(2000);
-  scale.power_up();            // reveil du hx711
+  scale.power_up();  // reveil du hx711
   delay(400);
-  scale.set_offset(LOADCELL_OFFSET);     // offset
-  scale.set_scale(calibration_factor);   // Calibration Factor obtained from first sketch (divider)
+  scale.set_offset(LOADCELL_OFFSET);    // offset
+  scale.set_scale(calibration_factor);  // Calibration Factor obtained from first sketch (divider)
   //scale.tare(); // Reset the scale to 0
 
   // Then, it calls several methods that you can use to get readings using the library.
@@ -960,7 +961,7 @@ void setup() {
   // ruche jlm autonome
   //----------------------
 #if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
-  if (!bme280.begin(ADDRESS)) {      // initialisation si bme280 present. 0x76 adresse i2c bme280
+  if (!bme280.begin(ADDRESS)) {  // initialisation si bme280 present. 0x76 adresse i2c bme280
     if (SerialMonitor) {
       Serial.println("Could not find a valid BME280 sensor, check wiring!");
     }
@@ -973,14 +974,14 @@ void setup() {
     }
   }
 
-  interrupteur.begin(); // bibliotheque interrupteur pour eviter les rebonds.
+  interrupteur.begin();  // bibliotheque interrupteur pour eviter les rebonds.
 #endif
   if (SerialMonitor) {
     Serial.println("Demarrage OK");
   }
 
   //digitalWrite(LED_BOARD, HIGH); //allumage de la led de la carte
-  getReadings();   // lecture des donnees
+  getReadings();  // lecture des donnees
   //digitalWrite(LED_BOARD, LOW);
 
   //----------------------
@@ -991,25 +992,25 @@ void setup() {
   chaine_bme280();
   delay(100);
   etatInterrupteur();  // etat de l'interrupteur
-  coupureEnergie ();   // sauvegarde de counter_ID en cas de coupure de l'energie
+  coupureEnergie();    // sauvegarde de counter_ID en cas de coupure de l'energie
 #endif
 
-  sendReadings();      // envoi des donnees
+  sendReadings();  // envoi des donnees
   delay(300);
 
-  scale.power_down();     // put the ADC du hx711 in sleep mode
+  scale.power_down();  // put the ADC du hx711 in sleep mode
   if (SerialMonitor) {
     Serial.println("ADC HX711 Going to sleep mode now");
   }
 
-  LoRa.sleep();           // sleep mode
+  LoRa.sleep();  // sleep mode
   Serial.println("LoRa Going to sleep mode now");
 
   //Increment boot number and print it every reboot
   ++bootCount;
   // suivi chronologique du wakeup
   if (bootCount >= 9) {
-    bootCount =  0;
+    bootCount = 0;
   }
   if (SerialMonitor) {
     Serial.println("Boot number: " + String(bootCount));
@@ -1021,7 +1022,7 @@ void setup() {
   delay(200);
 
   // toggle DONE HIGH to cut power with TPL5110
-  digitalWrite(DONEPIN, HIGH); // enclenche l'arret du tpl5110
+  digitalWrite(DONEPIN, HIGH);  // enclenche l'arret du tpl5110
   delay(100);
   digitalWrite(DONEPIN, LOW);
 

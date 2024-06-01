@@ -13,10 +13,10 @@
 //=============
 //Numero Ruche
 //=============
-//#define RUCHE_NUMERO  01      // numero de la ruche jlm1
+#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
-#define RUCHE_NUMERO  04      // numero de la ruche jlm4
+//#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
@@ -38,7 +38,7 @@
 //Load Cell with HX711
 //=====================
 
-const int numberOfReadings = 10;
+const int numberOfReadings = 20;
 const int poidsAberrant = 12;      // test du poids aberrant pour relancer une mesure
 
 // Change sync word (0xF3) to match the receiver
@@ -104,11 +104,11 @@ float calibration_factor = -19800;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 18
 // pour ruche loic8 rfm95
-float calibration_factor = -20500;       // calibration factor   -20500
+float calibration_factor = -20500;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
-float calibration_factor = -20500;       // calibration factor   -20500
+float calibration_factor = -20200;       // calibration factor   -20500
 #endif
 
 // offset
@@ -166,11 +166,11 @@ const long LOADCELL_OFFSET = -86750;      // offset   -86750
 
 #elif RUCHE_NUMERO == 18
 // pour ruche loic8 rfm95
-const long LOADCELL_OFFSET = -78300;      // offset   -78300
+const long LOADCELL_OFFSET = -78300;      // offset   -86750
 
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
-const long LOADCELL_OFFSET = -95850;      // offset   -95850
+const long LOADCELL_OFFSET = -59140;      // offset   -95850
 #endif
 
 //==============
@@ -179,7 +179,7 @@ const long LOADCELL_OFFSET = -95850;      // offset   -95850
 // nombres premiers 41, 61 , 127, 181, 241, 307, 313, 331, 601, 607, 613, 617, 619, 631, 907
 // nombres premiers 577, 587, 593, 599, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701
 #if RUCHE_NUMERO == 01
-#define TIME_TO_SLEEP  181     // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   331    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 02
 #define TIME_TO_SLEEP   241    // Time ESP32 will go to sleep (in seconds)
@@ -218,10 +218,10 @@ const long LOADCELL_OFFSET = -95850;      // offset   -95850
 #define TIME_TO_SLEEP   587    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 18
-#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   577    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 19
-#define TIME_TO_SLEEP   60    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   607    // Time ESP32 will go to sleep (in seconds)
 #endif
 
 //----------------------
@@ -293,7 +293,7 @@ const int temperatureAberrante = 6; //test de le temperature aberrante pour rela
 //====================
 int cad = 4095 ;                        // pas du convertisseur
 float tensionEsp32 = 3.3 ;              // tension de reference
-const float numberOfReadingsBat = 10.0; // nombre de lectures du port externe
+const float numberOfReadingsBat = 20.0; // nombre de lectures du port externe
 // float analogReadReference  = 1.1 ;   // reference theorique
 float mesureTension = 0.0;
 
@@ -441,7 +441,7 @@ const int tensionElevee = 16;         // tension elevee
 // batterie 12v
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
-float correction = -0.35 ;            // correction
+float correction = -2.50 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 const int tensionFaible = 10;         // tension faible
