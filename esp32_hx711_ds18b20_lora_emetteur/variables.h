@@ -13,11 +13,11 @@
 //=============
 //Numero Ruche
 //=============
-#define RUCHE_NUMERO  01      // numero de la ruche jlm1
+//#define RUCHE_NUMERO  01      // numero de la ruche jlm1
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
-//#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
+#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
@@ -68,7 +68,7 @@ float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-float calibration_factor = -22150;       // calibration factor    -22150
+float calibration_factor = -21650;       // calibration factor    -21650
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm5 rfm95
@@ -130,7 +130,7 @@ const long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-const long LOADCELL_OFFSET = 78400;        // offset 78400
+const long LOADCELL_OFFSET = 161921;        // offset 161921
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm5 rfm95
@@ -191,7 +191,7 @@ const long LOADCELL_OFFSET = -59140;      // offset   -95850
 #define TIME_TO_SLEEP   313    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 05
-#define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   241    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 06
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
@@ -339,13 +339,13 @@ const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 05
 // batterie 5v
-float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
+float offsetCalcule = 0.16;           // offset mesure par voltmetre gpio35 sans le tpl5110
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
-float correction = 0.02;              // correction resistances - mesure en drv sans le tpl5110
-float tensionDiode = 0.20;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+float correction = -0.18;             // correction resistances - mesure en drv sans le tpl5110
+float tensionDiode = 0.21;            // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
 const int tensionFaible = 3;          // tension faible
-const int tensionElevee = 7;         // tension elevee
+const int tensionElevee = 7;          // tension elevee
 
 #elif RUCHE_NUMERO == 06
 // batterie 5v

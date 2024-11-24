@@ -60,7 +60,7 @@ float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-float calibration_factor = -22150;       // calibration factor    -22150
+float calibration_factor = -21650;       // calibration factor    -21650
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -118,7 +118,7 @@ long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-long LOADCELL_OFFSET = 78400;       // offset 78400
+long LOADCELL_OFFSET = 161921;       // offset 161921
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -221,8 +221,8 @@ float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
 float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
-float correction = 0.02;              // correction resistances - mesure en drv sans le tpl5110
-float tensionDiode = 0.20;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+float correction = -0.18;              // correction resistances - mesure en drv sans le tpl5110
+float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
 
 #elif RUCHE_NUMERO == 11
 // batterie 12v
