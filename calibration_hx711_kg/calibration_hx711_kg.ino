@@ -37,7 +37,7 @@ HX711 loadcell;   // objet loadcell
 //=========================================
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
-bool calibration = 1 ;                 // 1 = reglage calibration et 0 = reglage offset
+bool calibration = 0 ;                 // 1 = reglage calibration et 0 = reglage offset
 bool batterie = 0 ;                    // 1 = reglage de la correction batterie et 0 calibration / offset
 //#define BAT  12             // tension batterie 12v
 #define BAT  5                // tension batterie 5v
@@ -159,6 +159,9 @@ float HX711::get_units(byte times) {
   loadcell.set_offset(LOADCELL_OFFSET);
   loadcell.set_gain(128); // channel A can be set for a 128 or 64 gain; channel B has a fixed 32 gain
   if (calibration) {
+    LOADCELL_OFFSET = 0;
+    loadcell.set_offset(LOADCELL_OFFSET);
+    delay(500);
     loadcell.tare();               //Reset the scale to 0
   }
 

@@ -60,7 +60,7 @@ float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-float calibration_factor = -21650;       // calibration factor    -21650
+float calibration_factor = -21450;       // calibration factor    -21450
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -118,7 +118,7 @@ long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
 // pour ruche jlm5 rfm95
-long LOADCELL_OFFSET = 161921;       // offset 161921
+long LOADCELL_OFFSET = -159508;       // offset -159508
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
