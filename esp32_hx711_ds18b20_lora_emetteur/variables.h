@@ -191,7 +191,7 @@ const long LOADCELL_OFFSET = -59140;      // offset   -95850
 #define TIME_TO_SLEEP   313    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 05
-#define TIME_TO_SLEEP   241    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 06
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)

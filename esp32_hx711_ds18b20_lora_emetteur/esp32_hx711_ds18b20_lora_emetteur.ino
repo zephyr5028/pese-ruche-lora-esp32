@@ -817,12 +817,12 @@ void etatInterrupteur() {
     if (SerialMonitor) {
       Serial.println("interrupteur ferme");
     }
-    BoitierCapteur.interrupteur = false;  // true 1 ouvert et false 0 ferme
+    BoitierCapteur.interrupteur = true;  // true 1 ou false 0
   } else {
     if (SerialMonitor) {
       Serial.println("interrupteur ouvert");
     }
-    BoitierCapteur.interrupteur = true;  // true 1 ouvert et false 0 ferme
+    BoitierCapteur.interrupteur = false;  // true 1 ou false 0
   }
 }
 
