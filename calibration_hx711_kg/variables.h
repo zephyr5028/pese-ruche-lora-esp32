@@ -17,7 +17,10 @@
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
-#define RUCHE_NUMERO  05      // numero de la ruche jlm5
+//#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
+//#define RUCHE_NUMERO  06      // numero de la ruche jlm6 autonome
+#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -59,8 +62,17 @@ float calibration_factor = -20900;       // calibration factor   -20900
 float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
-// pour ruche jlm5 rfm95
+// pour ruche jlm5 rfm95 autonome
 float calibration_factor = -21450;       // calibration factor    -21450
+
+#elif RUCHE_NUMERO == 06
+// pour ruche jlm6 rfm95 autonome
+float calibration_factor = -20000;       // calibration factor    -20000
+
+#elif RUCHE_NUMERO == 07
+// pour ruche jlm7 rfm95
+float calibration_factor = -22000;       // calibration factor    -22000
+
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -117,8 +129,16 @@ long LOADCELL_OFFSET = -80400;      // offset  -80400
 long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
-// pour ruche jlm5 rfm95
+// pour ruche jlm5 rfm95 autonome
 long LOADCELL_OFFSET = -159508;       // offset -159508
+
+#elif RUCHE_NUMERO == 06
+// pour ruche jlm6 rfm95 autonome
+long LOADCELL_OFFSET = -150000;       // offset -150000
+
+#elif RUCHE_NUMERO == 07
+// pour ruche jlm7 rfm95 autonome
+long LOADCELL_OFFSET = -40120;       // offset -40120
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -209,20 +229,37 @@ float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 
 #elif RUCHE_NUMERO == 04
-// batterie 5v
-int R1 = 27000;                       // resistance r1 du pont
-int R2 = 10000;                       // resistance r2 du pont
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.15;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
-float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
+float tensionDiode = 0.80 ;           // tension de la diode de protection invertion 1n4007
 
 #elif RUCHE_NUMERO == 05
-// batterie 5v
+// batterie 5v autonome
 float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
-int R1 = 27000;                       // resistance r1 du pont
-int R2 = 10000;                       // resistance r2 du pont
-float correction = -0.18;              // correction resistances - mesure en drv sans le tpl5110
+int R1 = 27000;                      // resistance r1 du pont
+int R2 = 10000;                      // resistance r2 du pont
+float correction = -0.18;            // correction resistances - mesure en drv sans le tpl5110
 float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+
+#elif RUCHE_NUMERO == 06
+// batterie 5v autonome
+float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
+int R1 = 27000;                      // resistance r1 du pont
+int R2 = 10000;                      // resistance r2 du pont
+float correction = -0.18;            // correction resistances - mesure en drv sans le tpl5110
+float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+
+#elif RUCHE_NUMERO == 07
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -0.35;             // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
 
 #elif RUCHE_NUMERO == 11
 // batterie 12v

@@ -17,8 +17,10 @@
 //#define RUCHE_NUMERO  02      // numero de la ruche jlm2
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
-#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
+//#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
+#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
 //#define RUCHE_NUMERO  13      // numero de la ruche loic3
@@ -67,12 +69,17 @@ float calibration_factor = -20900;       // calibration factor   -20900
 float calibration_factor = -19900;       // calibration factor   -19900
 
 #elif RUCHE_NUMERO == 05
-// pour ruche jlm5 rfm95
+// pour ruche jlm5 rfm95 autonome
 float calibration_factor = -21450;       // calibration factor    -21450
 
 #elif RUCHE_NUMERO == 06
-// pour ruche jlm5 rfm95
-float calibration_factor = -22150;       // calibration factor    -22150
+// pour ruche jlm6 rfm95 autonome
+float calibration_factor = -20000;       // calibration factor    -20000
+
+#elif RUCHE_NUMERO == 07
+// pour ruche jlm7 rfm95
+float calibration_factor = -22000;       // calibration factor   -22000
+
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -129,12 +136,17 @@ const long LOADCELL_OFFSET = -80400;      // offset  -80400
 const long LOADCELL_OFFSET = -114050;      // offset -114050
 
 #elif RUCHE_NUMERO == 05
-// pour ruche jlm5 rfm95
+// pour ruche jlm5 rfm95 autonome
 const long LOADCELL_OFFSET = -159508;        // offset -159508
 
 #elif RUCHE_NUMERO == 06
-// pour ruche jlm5 rfm95
-const long LOADCELL_OFFSET = 78400;        // offset 78400
+// pour ruche jlm6 rfm95 autonome
+const long LOADCELL_OFFSET = -78000;        // offset -78000
+
+#elif RUCHE_NUMERO == 07
+// pour ruche jlm7 rfm95
+const long LOADCELL_OFFSET = -40120;        // offset -40120
+
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -195,6 +207,10 @@ const long LOADCELL_OFFSET = -59140;      // offset   -95850
 
 #elif RUCHE_NUMERO == 06
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 07
+#define TIME_TO_SLEEP   331    // Time ESP32 will go to sleep (in seconds)
+
 
 #elif RUCHE_NUMERO == 11
 #define TIME_TO_SLEEP  601     // Time ESP32 will go to sleep (in seconds)
@@ -338,7 +354,7 @@ const int tensionFaible = 10;         // tension faible
 const int tensionElevee = 16;         // tension elevee
 
 #elif RUCHE_NUMERO == 05
-// batterie 5v
+// batterie 5v autonome
 float offsetCalcule = 0.16;           // offset mesure par voltmetre gpio35 sans le tpl5110
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
@@ -348,7 +364,7 @@ const int tensionFaible = 3;          // tension faible
 const int tensionElevee = 7;          // tension elevee
 
 #elif RUCHE_NUMERO == 06
-// batterie 5v
+// batterie 5v autonome
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
 float correction = -0.15;             // correction
@@ -356,6 +372,17 @@ float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
 const int tensionFaible = 3;          // tension faible
 const int tensionElevee = 7;         // tension elevee
+
+#elif RUCHE_NUMERO == 07
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -0.35 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
+
 
 #elif RUCHE_NUMERO == 11
 // batterie 12v
