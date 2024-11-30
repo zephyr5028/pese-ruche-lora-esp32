@@ -137,8 +137,8 @@ long LOADCELL_OFFSET = -159508;       // offset -159508
 long LOADCELL_OFFSET = -150000;       // offset -150000
 
 #elif RUCHE_NUMERO == 07
-// pour ruche jlm7 rfm95 autonome
-long LOADCELL_OFFSET = -40120;       // offset -40120
+// pour ruche jlm7 rfm95
+long LOADCELL_OFFSET = -43570;       // offset -43570
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -256,7 +256,7 @@ float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en re
 // batterie 12v
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
-float correction = -0.35;             // correction
+float correction = -0.55;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 

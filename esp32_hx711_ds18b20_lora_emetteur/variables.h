@@ -145,7 +145,7 @@ const long LOADCELL_OFFSET = -78000;        // offset -78000
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
-const long LOADCELL_OFFSET = -40120;        // offset -40120
+const long LOADCELL_OFFSET = -43370;        // offset -43370
 
 
 #elif RUCHE_NUMERO == 11
@@ -209,7 +209,7 @@ const long LOADCELL_OFFSET = -59140;      // offset   -95850
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 07
-#define TIME_TO_SLEEP   331    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   587    // Time ESP32 will go to sleep (in seconds)
 
 
 #elif RUCHE_NUMERO == 11
@@ -377,7 +377,7 @@ const int tensionElevee = 7;         // tension elevee
 // batterie 12v
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
-float correction = -0.35 ;            // correction
+float correction = -0.55 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 const int tensionFaible = 10;         // tension faible
