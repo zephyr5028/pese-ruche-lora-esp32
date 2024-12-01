@@ -1,5 +1,7 @@
 /********************************************************************************************
    Reception de balances connectées avec ESP32 lora et serveur web
+   utilisation d'un tpl5110, batterie nimh et panneau solaire 5w 12v pour une autonomie complete
+
 
    jlm le 21 septembre 2022   -  suivi par GIT
 
@@ -13,6 +15,7 @@
    https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
    https://lora.readthedocs.io/en/latest/
 
+   carte esp32 par expressifs systems version 2.0.17
 ********************************************************************************************/
 
 //=============================================================================================
@@ -24,7 +27,7 @@
 #include "ESPmDNS.h"
 #include "ESPAsyncWebServer.h"
 #include "ThingSpeak.h"
-#include "secrets.h" // fichier codes
+#include "secrets.h"  // fichier codes
 #include "variables.h"
 
 // memoire flash esp32
@@ -44,19 +47,29 @@
 #include <ArduinoJson.h>
 #endif
 
-//==================================
-// structure de donnees d'une ruche
-//==================================
-struct ruche {
-  String numRuche;  // numero de la ruche
-  String poids;
-  String tempeDs18b20;
-  String vBat;
-  String tempeBme280;
-};
-
+//===============================
+// objet des donnees d'une ruche
+//===============================
 // objet ruche
-ruche Ruche = { .numRuche = "", .poids = "", .tempeDs18b20 = "", .vBat = "", .tempeBme280 = ""}; // definition de la ruche
+ruche Ruche = { .numRuche = "", .poids = "", .tempeDs18b20 = "", .vBat = "", .tempeBme280 = "" };  // definition de la ruche
+
+//============================================
+// objet des donnees d'un boitier de capteurs
+//============================================
+// objet boitier
+boitierCapteur BoitierCapteurs = {
+  .tempeDS18B20 = "",
+  .numero = "",
+  .poids = "",
+  .vBat = "",
+  .tempeBME280 = "",
+  .pressionBME280 = "",
+  .humiBME280 = "",
+  .comfortBME280 = "",
+  .forecastBME280 = "",
+  .nom = "",
+  .interrupteur = ""
+};
 
 // conversion de string to int : toInt()  string to float :  toFloat()
 
@@ -85,38 +98,10 @@ Dusk2Dawn dognon(SECRET_LATITUDE, SECRET_LONGITUDE, 1);  // 1 pour +1 utc !!!
 /*  Available methods are sunrise() and sunset(). Arguments are year, month,
     day, and if Daylight (heure d'ete) Saving Time is in effect.
 */
-int doSunrise  = 0 ;
-int doSunset   = 0 ;
 
-//===============================================================
-// brochage de l'emetteur/recepteur lora en fonction de la carte
-// define the pins used by the LoRa transceiver module ttgo
-//===============================================================
-#define DIO0 26
-#define RST 14
-#define SS 18
-#define SCK 5
-#define MOSI 27
-#define MISO 19
-
-//433E6 for Asia
-//866E6 for Europe
-//915E6 for North America
-//#define BAND 866E6
-#define BAND 868300000
-
-#define PABOOST true
-
-//==========
-// OLED pins
-//==========
-#define OLED_SDA 4
-#define OLED_SCL 15
-#define OLED_RST 16
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-int contrast = 8; // Where contrast is a value from 0 to 255 (sets contrast e.g. brightness)
-
+//============
+// objet OLED
+//============
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
 
 //============
@@ -127,29 +112,9 @@ WiFiMulti wifiMulti;  // declaration d'un objet multi wifi
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 10000;
 
-String adresse_ip;                 // the IP address of your shield
+String adresse_ip;  // the IP address of your shield
 
-WiFiClient  client;  // objet wifi
-
-//=================================
-// Variables to save date and time
-//=================================
-const char* ntpServer = SECRET_NTP_SERVER;
-const long  gmtOffset_sec = 0;
-const int   daylightOffset_sec = 3600;
-String TimeStamp;
-String SunSet;
-String SunRise;
-String SolarNoon;
-
-//===============================================
-// Initialize variables to get and save LoRa data
-//===============================================
-int counter = 0;                 // compteur
-int rssi;
-int snr;
-String loRaMessage;
-String readingID;
+WiFiClient wifiClient;  // objet wifi
 
 //=========================================
 // Create AsyncWebServer object on port 80
@@ -168,35 +133,25 @@ String processor(const String& var) {
   //Serial.println(var);
   if (var == "TEMPERATURE") {
     return Ruche.tempeDs18b20;
-  }
-  else if (var == "READINGID") {
+  } else if (var == "READINGID") {
     return readingID;
-  }
-  else if (var == "NUMRUCHE") {
+  } else if (var == "NUMRUCHE") {
     return Ruche.numRuche;
-  }
-  else if (var == "POIDS") {
+  } else if (var == "POIDS") {
     return Ruche.poids;
-  }
-  else if (var == "VBAT") {
+  } else if (var == "VBAT") {
     return Ruche.vBat;
-  }
-  else if (var == "TIMESTAMP") {
+  } else if (var == "TIMESTAMP") {
     return TimeStamp;
-  }
-  else if (var == "RSSI") {
+  } else if (var == "RSSI") {
     return String(rssi);
-  }
-  else if (var == "SNR") {
+  } else if (var == "SNR") {
     return String(snr);
-  }
-  else if (var == "SUNSET") {
+  } else if (var == "SUNSET") {
     return SunSet;
-  }
-  else if (var == "SUNRISE") {
+  } else if (var == "SUNRISE") {
     return SunRise;
-  }
-  else if (var == "SOLARNOON") {
+  } else if (var == "SOLARNOON") {
     return SolarNoon;
   }
   return String();
@@ -214,9 +169,10 @@ void startOLED() {
 
   //initialize OLED
   Wire.begin(OLED_SDA, OLED_SCL);
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) { // Address 0x3C for 128x32
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) {  // Address 0x3C for 128x32
     Serial.println(F("SSD1306 allocation failed"));
-    for (;;); // Don't proceed, loop forever
+    for (;;)
+      ;  // Don't proceed, loop forever
   }
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -224,7 +180,7 @@ void startOLED() {
   display.setCursor(0, 0);
   display.print("PROJET LORA RECEIVER");
   display.ssd1306_command(SSD1306_SETCONTRAST);
-  display.ssd1306_command(contrast); // Where contrast is a value from 0 to 255 (sets contrast e.g. brightness)
+  display.ssd1306_command(contrast);  // Where contrast is a value from 0 to 255 (sets contrast e.g. brightness)
   display.display();
 }
 
@@ -250,9 +206,9 @@ void startLoRA() {
     //LoRa.enableCrc(); //N'oubliez pas que chaque fois que je démarre la radio, je dois donner une activation dans le CRC
     //LoRa.setSyncWord(0x97);
     //Facteur d’étalement (SF) : De 6 à 12, plus la valeur est grande, plus la portée est grande
-    LoRa.setSpreadingFactor(10);                         // Setup Spreading Factor (6 ~ 12)
+    LoRa.setSpreadingFactor(10);  // Setup Spreading Factor (6 ~ 12)
     // Setup BandWidth, option: 7800,10400,15600,20800,31250,41700,62500,125000,250000,500000
-    LoRa.setSignalBandwidth(125000);                    // Setup BandWidth, option: 7800,10400,15600,20800,31250,41700,62500,125000,250000,500000
+    LoRa.setSignalBandwidth(125000);  // Setup BandWidth, option: 7800,10400,15600,20800,31250,41700,62500,125000,250000,500000
     //LoRa.setCodingRate4(8);                           // Setup Coding Rate:5(4/5),6(4/6),7(4/7),8(4/8)
     //LoRa.dumpRegisters(Serial);
     //LoRa.setTxPower(20,RF_PACONFIG_PASELECT_PABOOST); //20dB output must via PABOOST
@@ -274,7 +230,8 @@ void startLoRA() {
   // Change sync word (0xF3) to match the receiver
   // The sync word assures you don't get LoRa messages from other LoRa transceivers
   // ranges from 0-0xFF
-  LoRa.setSyncWord(0xF3);
+  //LoRa.setSyncWord(0xF3);
+  LoRa.setSyncWord(synchroLora);
   delay(300);
 }
 
@@ -282,7 +239,7 @@ void startLoRA() {
 // mqtt
 //======
 #if MQTT
-PubSubClient clientMqtt(client);
+PubSubClient clientMqtt(wifiClient);
 int WLcountMQTT = 0;
 //const int taille = 30;                     // taille du tableau pour l'envoi des valeurs des sondes
 //char chaine[taille - 1] = "" ;             // tableau pour l'envoi des valeurs des sondes
@@ -301,6 +258,35 @@ void getLoRaData() {
     // Ruche.numRuche = ""; Ruche.poids = ""; Ruche.tempeDs18b20 = ""; Ruche.vBat = "";
 
     Serial.print(LoRaData);
+    /*
+      LoRaMessage = String(counterID) +
+                "/" + String(BoitierCapteur.tempeDS18B20) +
+                "&" + String(BoitierCapteur.numBoitierCapteur) +
+                "#" + String(BoitierCapteur.poids) +
+                "{" + String(BoitierCapteur.vBat) +
+                "}" + Capteur_bme280.tempe +
+                "(" + Capteur_bme280.pression +
+                ")" + Capteur_bme280.humi +
+                "@" + BoitierCapteur.nameBoitierCapteur +
+                "~" + String(hum_stat) +
+                "^" + String(bar_for) +
+                "!" + String(BoitierCapteur.interrupteur);
+    */
+    /*
+      struct boitierCapteur {
+      String tempeDS18B20;
+      String numero;          // du boitier de capteurs
+      String poids;
+      String vBat;
+      String tempeBME280;
+      String pressionBME280;
+      String humiBME280;
+      String comfortBME280;
+      String forecastBME280;
+      String nom;
+      String interrupteur;// du boitier de capteurs
+      };
+    */
 
     // Get readingID, temperature and soil moisture
     int pos1 = LoRaData.indexOf('/');
@@ -308,14 +294,80 @@ void getLoRaData() {
     int pos3 = LoRaData.indexOf('#');
     int pos4 = LoRaData.indexOf('{');
     int pos5 = LoRaData.indexOf('}');
+    int pos6 = LoRaData.indexOf('(');
+    int pos7 = LoRaData.indexOf(')');
+    int pos8 = LoRaData.indexOf('@');
+    int pos9 = LoRaData.indexOf('~');
+    int posA = LoRaData.indexOf('^');
+    int posB = LoRaData.indexOf('!');
+
+    // 1/21.25&101#0.00{5.58}23.09(1014)65@chassis~1^2
+    // 9/22.50&5#0.03{5.45}21.84(1014)69@ruche_05~1^2!1
+
     readingID = LoRaData.substring(0, pos1);
-    Ruche.tempeDs18b20 = LoRaData.substring(pos1 + 1, pos2);
-    Ruche.numRuche = LoRaData.substring(pos2 + 1, pos3);
-    Ruche.poids = LoRaData.substring(pos3 + 1, pos4);
-    Ruche.vBat = LoRaData.substring(pos4 + 1, pos5);
-    Ruche.tempeBme280 = LoRaData.substring(pos5 + 1, LoRaData.length());
+    BoitierCapteurs.tempeDS18B20 = LoRaData.substring(pos1 + 1, pos2);
+    Ruche.tempeDs18b20 = BoitierCapteurs.tempeDS18B20;
+    BoitierCapteurs.numero = LoRaData.substring(pos2 + 1, pos3);
+    Ruche.numRuche = BoitierCapteurs.numero;
+    BoitierCapteurs.poids = LoRaData.substring(pos3 + 1, pos4);
+    Ruche.poids = BoitierCapteurs.poids;
+    BoitierCapteurs.vBat = LoRaData.substring(pos4 + 1, pos5);
+    Ruche.vBat = BoitierCapteurs.vBat;
+    BoitierCapteurs.tempeBME280 = LoRaData.substring(pos5 + 1, pos6);
+    BoitierCapteurs.pressionBME280 = LoRaData.substring(pos6 + 1, pos7);
+    BoitierCapteurs.humiBME280 = LoRaData.substring(pos7 + 1, pos8);
+    BoitierCapteurs.nom = LoRaData.substring(pos8 + 1, pos9);
+    BoitierCapteurs.comfortBME280 = LoRaData.substring(pos9 + 1, posA);
+    BoitierCapteurs.forecastBME280 = LoRaData.substring(posA + 1, posB);
+    BoitierCapteurs.interrupteur = LoRaData.substring(posB + 1, LoRaData.length());
+
+    hum_stat = BoitierCapteurs.comfortBME280.toInt();  // pour l'envoi mqtt domoticz
+    bar_for = BoitierCapteurs.forecastBME280.toInt();  // pour l'envoi mqtt domoticz
+
+    //Forecast: 0 None, 1 Sunny, 2 PartlyCloudy, 3 Cloudy, 4 Rain
+    if (bar_for == 4) {  // rain
+      BoitierCapteurs.forecastBME280 = "rain";
+    } else if (bar_for == 3) {  // cloudy
+      BoitierCapteurs.forecastBME280 = "cloudy";
+    } else if (bar_for == 2) {  // Partly Cloudy
+      BoitierCapteurs.forecastBME280 = "partly cloudy";
+    } else if (bar_for == 1) {  // wet / sunny
+      BoitierCapteurs.forecastBME280 = "wet sunny";
+    } else {  // none  bar_for = 0
+      BoitierCapteurs.forecastBME280 = "none";
+    }
+
+    // Humidity status: 0 Normal, 1 Comfort, 2 Dry, 3 Wet
+    if (hum_stat == 2) {  // dry
+      BoitierCapteurs.comfortBME280 = "dry";
+    } else if (hum_stat == 0) {  // normal
+      BoitierCapteurs.comfortBME280 = "normal";
+    } else if (hum_stat == 1) {  // confort
+      BoitierCapteurs.comfortBME280 = "comfort";
+    } else if (hum_stat = 3) {  // humide
+      BoitierCapteurs.comfortBME280 = "wet";
+    }
 
     Serial.println("");
+    Serial.print("numero du boitier de capteurs : ");
+    Serial.println(BoitierCapteurs.numero);
+
+    /*
+      // Get readingID, temperature and soil moisture
+      int pos1 = LoRaData.indexOf('/');
+      int pos2 = LoRaData.indexOf('&');
+      int pos3 = LoRaData.indexOf('#');
+      int pos4 = LoRaData.indexOf('{');
+      int pos5 = LoRaData.indexOf('}');
+      readingID = LoRaData.substring(0, pos1);
+      Ruche.tempeDs18b20 = LoRaData.substring(pos1 + 1, pos2);
+      Ruche.numRuche = LoRaData.substring(pos2 + 1, pos3);
+      Ruche.poids = LoRaData.substring(pos3 + 1, pos4);
+      Ruche.vBat = LoRaData.substring(pos4 + 1, pos5);
+      Ruche.tempeBme280 = LoRaData.substring(pos5 + 1, LoRaData.length());
+    */
+
+    //Serial.println("");
     Serial.print("numero de la ruche : ");
     Serial.println(Ruche.numRuche);
   }
@@ -328,16 +380,26 @@ void getLoRaData() {
   Serial.print(" and SNR ");
   Serial.println(snr);
 
+  adresse_ip = WiFi.localIP().toString();
+
   display.clearDisplay();
   display.setCursor(0, 10);
   display.print("IP Adr: ");
   display.setCursor(40, 10);
-  display.print(WiFi.localIP());
+  //display.print(WiFi.localIP());
+  display.print(adresse_ip);
 
   display.setCursor(0, 20);
-  display.print("Ruche n: ");
-  display.setCursor(52, 20);
+  display.print("Ruche: ");
+  display.setCursor(42, 20);
   display.print(Ruche.numRuche);
+
+  /*
+    display.setCursor(0, 20);
+    display.print("Boitier: ");
+    display.setCursor(48, 20);
+    display.print(BoitierCapteurs.numero);
+  */
 
   display.setCursor(68, 20);
   display.print("RSSI: ");
@@ -355,6 +417,7 @@ void getLoRaData() {
   display.print("Temperature: ");
   display.setCursor(76, 40);
   display.print(Ruche.tempeDs18b20);
+  //display.print(BoitierCapteurs.tempeDS18B20);
   display.setCursor(112, 40);
   display.print("C");
 
@@ -369,7 +432,6 @@ void getLoRaData() {
   display.print(snr);
 
   display.display();
-
 }
 
 //======
@@ -387,8 +449,7 @@ void getLoRaData() {
    int tm_yday;        // day in the year, range 0 to 365
    int tm_isdst;       // daylight saving time
 */
-void printLocalTime()
-{
+void printLocalTime() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Failed to obtain time");
@@ -444,17 +505,17 @@ void printLocalTime()
     Krish_year = timeinfo.tm_year +1900;
   */
   Daylight_isdst = timeinfo.tm_isdst;
-  Serial.print("daylight : "); // heure ete
+  Serial.print("daylight : ");     // heure ete
   Serial.println(Daylight_isdst);  // heure ete
   Serial.print("year : ");
   Serial.println(timeinfo.tm_year + 1900);
   Serial.print("date / heure : ");
-  Serial.println (&timeinfo, "%m %d %Y / %H:%M:%S");
+  Serial.println(&timeinfo, "%m %d %Y / %H:%M:%S");
 
-  doSunrise  = dognon.sunrise(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, Daylight_isdst);
-  doSunset   = dognon.sunset(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, Daylight_isdst);
+  doSunrise = dognon.sunrise(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, Daylight_isdst);
+  doSunset = dognon.sunset(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, Daylight_isdst);
 
-  char timeStringBuff[50]; //50 chars should be enough
+  char timeStringBuff[50];  //50 chars should be enough
   strftime(timeStringBuff, sizeof(timeStringBuff), "%A %d/%m/%Y %H:%M:%S", &timeinfo);
   //print like "const char*"
   //Serial.println(timeStringBuff);
@@ -474,7 +535,7 @@ void SunsetSunrise() {
   Serial.print("Sunrise en minutes: ");
   Serial.println(doSunrise);  //
   Serial.print("Sunset en minutes: ");
-  Serial.println(doSunset);   //
+  Serial.println(doSunset);  //
 
   /*  A static method converts the returned time to a 24-hour clock format.
       Arguments are a character array and time in minutes.
@@ -511,8 +572,50 @@ void SunsetSunrise() {
   char time4[] = "00:00";
   bool response = Dusk2Dawn::min2str(time4, doSunrise);
   if (response == false) {
-    Serial.println(time4); // "ERROR"
+    Serial.println(time4);  // "ERROR"
     Serial.println("Uh oh!");
+  }
+}
+
+//===================================================
+// chaine pour l'envoi des valeurs de la sonde BME280
+//===================================================
+void chaine_bme280() {
+  // Convert the value to a char array
+  // float myFloat = myString.toFloat();
+
+  char valeur_temp[6] = "";  // temperature
+  float tempe = BoitierCapteurs.tempeBME280.toFloat();
+  dtostrf(tempe, 2, 2, valeur_temp);
+  strcat(chaine, valeur_temp);
+  strcat(chaine, ";");
+
+  char valeur_hum[5] = "";  // humidite
+  float humi = BoitierCapteurs.humiBME280.toFloat();
+  dtostrf(humi, 2, 2, valeur_hum);
+  strcat(chaine, valeur_hum);
+  strcat(chaine, ";");
+
+  char valeur_hum_stat[1] = "";  // humidite confort
+  //hum_stat = BoitierCapteurs.comfortBME280.toInt();
+  dtostrf(hum_stat, 1, 0, valeur_hum_stat);
+  strcat(chaine, valeur_hum_stat);
+  strcat(chaine, ";");
+
+  char valeur_pre[6] = "";  // pression barometrique
+  float pre = BoitierCapteurs.pressionBME280.toFloat();
+  dtostrf(pre, 4, 0, valeur_pre);
+  strcat(chaine, valeur_pre);
+  strcat(chaine, ";");
+
+  char valeur_bar_for[1] = "";  // prevision meteo avec le barometre
+  //bar_for = BoitierCapteurs.forecastBME280.toInt();
+  dtostrf(bar_for, 1, 0, valeur_bar_for);
+  strcat(chaine, valeur_bar_for);
+
+  if (debug) {
+    Serial.print("Chaine Sonde bme280 : ");
+    Serial.println(chaine);  // pour l'envoi mqtt domoticz
   }
 }
 
@@ -522,15 +625,15 @@ void SunsetSunrise() {
 void thinkspeak() {
   // set the fields with the values
   if (SECRET_THINGSPEAK_TRUE and SECRET_WIFI_TRUE) {
-    int num_ruche = Ruche.numRuche.toInt(); // string to int
+    int num_ruche = Ruche.numRuche.toInt();  // string to int
 
-    if (JLM and num_ruche >= 1 and num_ruche <= 9) {
+    if (JLM and num_ruche >= 1 and num_ruche <= 4) {                  // 4 pour l'instant
       field_thinkspeak("1", "2", "3", "4", "5", "6", "7", "8", "9");  // numeros ruhes de 1 a 9
-      write_thingspeak (myChannelNumberJlm, myWriteAPIKeyJlm);
+      write_thingspeak(myChannelNumberJlm, myWriteAPIKeyJlm);
 
     } else if (LOIC and num_ruche >= 11 and num_ruche <= 19) {
-      field_thinkspeak("11", "12", "13", "14", "15", "16", "17", "18", "19"); // Numeros ruches de 11 a 19
-      write_thingspeak (myChannelNumberLoic, myWriteAPIKeyLoic);
+      field_thinkspeak("11", "12", "13", "14", "15", "16", "17", "18", "19");  // Numeros ruches de 11 a 19
+      write_thingspeak(myChannelNumberLoic, myWriteAPIKeyLoic);
     }
   }
 }
@@ -553,21 +656,21 @@ void thinkspeak() {
 */
 
 // correlation numero ruche et field
-void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, String r6, String r7, String r8, String r9) {
+void field_thinkspeak(String r1, String r2, String r3, String r4, String r5, String r6, String r7, String r8, String r9) {
 #if JLM
   if (Ruche.numRuche == r1) {
-    ThingSpeak.setField(1, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(1, Ruche.poids);         // poids de la ruche
     ThingSpeak.setField(2, Ruche.tempeDs18b20);  // temperature de la ruche
     //ThingSpeak.setField(7, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r2) {
-    ThingSpeak.setField(3, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(3, Ruche.poids);         // poids de la ruche
     ThingSpeak.setField(4, Ruche.tempeDs18b20);  // temperature de la ruche
     //ThingSpeak.setField(8, Ruche.vBat);   // tension de la batterie
   } else if (Ruche.numRuche == r3) {
-    ThingSpeak.setField(5, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(5, Ruche.poids);         // poids de la ruche
     ThingSpeak.setField(6, Ruche.tempeDs18b20);  // temperature de la ruche
   } else if (Ruche.numRuche == r4) {
-    ThingSpeak.setField(7, Ruche.poids);  // poids de la ruche
+    ThingSpeak.setField(7, Ruche.poids);         // poids de la ruche
     ThingSpeak.setField(8, Ruche.tempeDs18b20);  // temperature de la ruche
   } else if (Ruche.numRuche == r5) {
 
@@ -578,7 +681,6 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
   } else if (Ruche.numRuche == r8) {
 
   } else if (Ruche.numRuche == r9) {
-
   }
 #endif
 
@@ -606,7 +708,7 @@ void field_thinkspeak (String r1, String r2, String r3, String r4, String r5, St
 }
 
 // envoi des donnees vers thingspeak
-void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey) {
+void write_thingspeak(unsigned long myChannelNumber, const char* myWriteAPIKey) {
   // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
   // pieces of information in a channel.  Here, we write to field 1.
   // int x = ThingSpeak.writeField(myChannelNumber, 1, ruche1.poids, myWriteAPIKey);
@@ -618,8 +720,7 @@ void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey)
   int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
   if (x == 200) {
     Serial.println("Channel update successful.");
-    Serial.println("");
-  }  else {
+  } else {
     Serial.println("Problem updating channel. HTTP error code " + String(x));
     Serial.println("");
   }
@@ -628,7 +729,7 @@ void write_thingspeak(unsigned long myChannelNumber, const char * myWriteAPIKey)
 //====================
 // page web not found
 //====================
-void notFound(AsyncWebServerRequest * request) {
+void notFound(AsyncWebServerRequest* request) {
   request->send(404, "text/plain", "Not found");
 }
 
@@ -639,12 +740,23 @@ void setup() {
   // Initialize Serial Monitor
   Serial.begin(SERIAL_BAUD);
 
-  lastResetWas = millis(); // pour reset esp32 intervals reguliers
+  lastResetWas = millis();  // pour reset esp32 intervals reguliers
 
+  /*
   startOLED();
   delay(2000);
   startLoRA();
   delay(3000);
+  */
+  Serial.println("");
+  Serial.println("Demarrage OK");
+  delay(300);
+  startOLED();
+  delay(1000);
+  startLoRA();
+  Serial.print("Synchro lora : ");
+  Serial.println(synchroLora);
+  delay(1000);
 
   // connection wifi
   if (SECRET_WIFI_TRUE) {
@@ -660,7 +772,7 @@ void setup() {
   }
 
   if (SECRET_THINGSPEAK_TRUE and SECRET_WIFI_TRUE) {
-    ThingSpeak.begin(client);  // Initialize ThingSpeak
+    ThingSpeak.begin(wifiClient);  // Initialize ThingSpeak
   }
 
   if (!SPIFFS.begin()) {
@@ -669,7 +781,7 @@ void setup() {
   }
 
   // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send(SPIFFS, "/index.html", String(), false, processor);
   });
 
@@ -685,43 +797,104 @@ void setup() {
     });
   */
 
-  server.on("/poids", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/poids", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", Ruche.poids.c_str());
   });
-  server.on("/readingid", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/readingid", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", readingID.c_str());
   });
-  server.on("/sunset", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/sunset", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", SunSet.c_str());
   });
-  server.on("/sunrise", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/sunrise", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", SunRise.c_str());
   });
-  server.on("/solarnoon", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/solarnoon", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", SolarNoon.c_str());
   });
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", Ruche.tempeDs18b20.c_str());
   });
-  server.on("/vbat", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/vbat", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", Ruche.vBat.c_str());
   });
-  server.on("/numruche", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/numruche", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", Ruche.numRuche.c_str());
   });
-  server.on("/timestamp", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/timestamp", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", TimeStamp.c_str());
   });
-  server.on("/rssi", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/rssi", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", String(rssi).c_str());
   });
-  server.on("/snr", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/snr", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send_P(200, "text/plain", String(snr).c_str());
   });
 
-  server.on("/winter", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/winter", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send(SPIFFS, "/winter.jpg", "image/jpg");
   });
+
+  /*
+    server.on("/poids", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.poids.c_str());
+    });
+    server.on("/nom", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.nom.c_str());
+    });
+    server.on("/readingid", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", readingID.c_str());
+    });
+    server.on("/sunset", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", SunSet.c_str());
+    });
+    server.on("/sunrise", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", SunRise.c_str());
+    });
+    server.on("/solarnoon", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", SolarNoon.c_str());
+    });
+    server.on("/DS18B20temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.tempeDS18B20.c_str());
+    });
+    server.on("/BME280temperature", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.tempeBME280.c_str());
+    });
+    server.on("/BME280humidity", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.humiBME280.c_str());
+    });
+    server.on("/BME280pression", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.pressionBME280.c_str());
+    });
+    server.on("/BME280comfort", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.comfortBME280.c_str());
+    });
+    server.on("/BME280forecast", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.forecastBME280.c_str());
+    });
+    server.on("/interrupteur", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.interrupteur.c_str());
+    });
+    server.on("/vbat", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.vBat.c_str());
+    });
+    server.on("/numero", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", BoitierCapteurs.numero.c_str());
+    });
+    server.on("/timestamp", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", TimeStamp.c_str());
+    });
+    server.on("/rssi", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", String(rssi).c_str());
+    });
+    server.on("/snr", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/plain", String(snr).c_str());
+    });
+
+    server.on("/domotique", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, "/domotique.jpg", "image/jpg");
+    });
+  */
 
   // Init and get the time
   //configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -740,7 +913,7 @@ void setup() {
 
   display.clearDisplay();
 #if MQTT
-  clientMqtt.setServer(mqttServer, mqttPort);   // On défini la connexion MQTT
+  clientMqtt.setServer(mqttServer, mqttPort);  // On défini la connexion MQTT
 #endif
 
   // Start server
@@ -765,53 +938,416 @@ void loop() {
     }
     printLocalTime();
     SunsetSunrise();
-    thinkspeak();
 
     //send data to MQTT
 #if MQTT
     // connection mqtt
     if (WiFi.status() == WL_CONNECTED) {
-      if (!client.connected()) {
+      if (!clientMqtt.connected()) {
         Serial.println("MQTT déconnecté, on reconnecte !");
         reconnect();
       }
-      if (client.connected()) {
+      if (clientMqtt.connected()) {
+        Serial.println("MQTT connecte");
         clientMqtt.loop();
         // SendDataMQTT(&environment);
-        if (JLM) {
-          if (Ruche.numRuche == "1") {
-            // envoi du poids
-            SendData(idxDeviceRuche1Poids, "Ruche1_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
-            // envoi de la temperature
-            SendData(idxDeviceRuche1Temperature, "Ruche1_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
-            // envoi de la tension de la baterrie
-            SendData(idxDeviceRuches1TensionBatterie, "Ruche1_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
-          } else if (Ruche.numRuche == "2") {
-            // envoi du poids
-            SendData(idxDeviceRuche2Poids, "Ruche2_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
-            // envoi de la temperature
-            SendData(idxDeviceRuche2Temperature, "Ruche2_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
-            // envoi de la tension de la baterrie
-            SendData(idxDeviceRuches2TensionBatterie, "Ruche2_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
-          } else if (Ruche.numRuche == "3") {
-            // envoi du poids
-            SendData(idxDeviceRuche3Poids, "Ruche3_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
-            // envoi de la temperature
-            SendData(idxDeviceRuche3Temperature, "Ruche3_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
-            // envoi de la tension de la batterie
-            SendData(idxDeviceRuches3TensionBatterie, "Ruche3_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
-          } else if (Ruche.numRuche == "4") {
-            // envoi du poids
-            SendData(idxDeviceRuche4Poids, "Ruche4_poids", Ruche.poids.c_str()); // Envoi des donnees via JSON et MQTT
-            // envoi de la temperature
-            SendData(idxDeviceRuche4Temperature, "Ruche4_temperature", Ruche.tempeDs18b20.c_str()); // Envoi des données via JSON et MQTT
-            // envoi de la tension de la batterie
-            SendData(idxDeviceRuches4TensionBatterie, "Ruche4_batterie_tension", Ruche.vBat.c_str()); // Envoi des données via JSON et MQTT
+
+#if JLM
+        if (Ruche.numRuche == "1") {
+          // envoi du poids
+          nomModule = "Ruche1_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche1Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche1_temperature";
+          SendData(idxDeviceRuche1Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche1_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches1TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (Ruche.numRuche == "2") {
+          // envoi du poids
+          nomModule = "Ruche2_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche2Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche2_temperature";
+          SendData(idxDeviceRuche2Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche2_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches2TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (Ruche.numRuche == "3") {
+          // envoi du poids
+          nomModule = "Ruche3_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche3Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche3_temperature";
+          SendData(idxDeviceRuche3Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Ruche3_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches3TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (Ruche.numRuche == "4") {
+          // envoi du poids
+          nomModule = "Ruche4_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche4Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche4_temperature";
+          SendData(idxDeviceRuche4Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Ruche4_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches4TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (Ruche.numRuche == "7") {
+          // envoi du poids
+          nomModule = "Ruche7_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche7Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche7_temperature";
+          SendData(idxDeviceRuche7Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Ruche7_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches7TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (BoitierCapteurs.numero == "101") {
+          // envoi de la temperature du ds18b20
+          nomModule = "BoitierCapteurs_101_temperature_ds18b20";
+          SendData(idxDeviceCapteurChassisTemperatureDS18B20, nomModule, BoitierCapteurs.tempeDS18B20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "BoitierCapteurs_101_tension_batterie";
+          SendData(idxDeviceCapteurChassisTensionBatterie, nomModule, BoitierCapteurs.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // creation d'une chaine avec les donnees de la sonde bme280.
+          chaine[0] = '\0';  // effacement du tableau
+          chaine_bme280();   //creation de la chaine a envoyer pour la sonde du bme280
+          // Envoi de la données via JSON et MQTT
+          nomModule = "BoitierCapteurs_101_BME280";
+          SendData(idxDeviceCapteurChassisBME280, nomModule, chaine, 0);  // Envoi des données via JSON et MQTT
+          // envoi de la position de l'interrupteur
+          nomModule = "BoitierCapteurs_101_Switch";
+          // en atendant la correction sur le boitier capteur, il manque la fin du message lora !!!
+          //SendData(idxDeviceCapteurChassisSwitch, nomModule, BoitierCapteurs.interrupteur.c_str(), 0);  // Envoi des données via JSON et MQTT
+
+        } else if (BoitierCapteurs.numero == "5") {
+          // envoi du poids
+          nomModule = "Capteur_Ruche5_poids";
+          // convert string to float
+          float poids = atof(BoitierCapteurs.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceCapteurRuche5Poids, nomModule, BoitierCapteurs.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature du ds18b20
+          nomModule = "Capteur_Ruche5_temperature_ds18b20";
+          SendData(idxDeviceCapteurRuche5TemperatureDS18B20, nomModule, BoitierCapteurs.tempeDS18B20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Capteur_Ruche5_tension_batterie";
+          // convert string to float
+          float bat = atof(BoitierCapteurs.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceCapteurRuches5TensionBatterie, nomModule, BoitierCapteurs.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+          // creation d'une chaine avec les donnees de la sonde bme280.
+          chaine[0] = '\0';  // effacement du tableau
+          chaine_bme280();   //creation de la chaine a envoyer pour la sonde du bme280
+          // Envoi de la données via JSON et MQTT
+          nomModule = "Capteurs_Ruche5_BME280";
+          SendData(idxDeviceCapteurRuche5BME280, nomModule, chaine, 0);  // Envoi des données via JSON et MQTT
+          // envoi de la position de l'interrupteur
+          nomModule = "Capteur_Ruche5_Switch";
+          if (BoitierCapteurs.interrupteur == "0") {                                                     // interrupteur ouvert nvalue a 0 ouvert
+            SendData(idxDeviceCapteurRuche5Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 0);  // Envoi des données via JSON et MQTT
+          } else {                                                                                       // interrupteur ferme nvalue a 1 ferme
+            SendData(idxDeviceCapteurRuche5Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 1);  // Envoi des données via JSON et MQTT
+          }
+
+        } else if (BoitierCapteurs.numero == "6") {
+          // envoi du poids
+          nomModule = "Capteur_Ruche6_poids";
+          // convert string to float
+          float poids = atof(BoitierCapteurs.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceCapteurRuche6Poids, nomModule, BoitierCapteurs.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature du ds18b20
+          nomModule = "Capteur_Ruche6_temperature_ds18b20";
+          SendData(idxDeviceCapteurRuche6TemperatureDS18B20, nomModule, BoitierCapteurs.tempeDS18B20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Capteur_Ruche6_tension_batterie";
+          // convert string to float
+          float bat = atof(BoitierCapteurs.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceCapteurRuches6TensionBatterie, nomModule, BoitierCapteurs.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+          // creation d'une chaine avec les donnees de la sonde bme280.
+          chaine[0] = '\0';  // effacement du tableau
+          chaine_bme280();   //creation de la chaine a envoyer pour la sonde du bme280
+          // Envoi de la données via JSON et MQTT
+          nomModule = "Capteurs_Ruche6_BME280";
+          SendData(idxDeviceCapteurRuche6BME280, nomModule, chaine, 0);  // Envoi des données via JSON et MQTT
+          // envoi de la position de l'interrupteur
+          nomModule = "Capteur_Ruche6_Switch";
+          if (BoitierCapteurs.interrupteur == "0") {                                                     // interrupteur ouvert nvalue a 0 ouvert
+            SendData(idxDeviceCapteurRuche6Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 0);  // Envoi des données via JSON et MQTT
+          } else {                                                                                       // interrupteur ferme nvalue a 1 ferme
+            SendData(idxDeviceCapteurRuche6Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 1);  // Envoi des données via JSON et MQTT
           }
         }
+
+#elif LOIC
+        // ruches de 11 a 19
+        if (Ruche.numRuche == "11") {
+          // envoi du poids
+          nomModule = "Ruche11_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche11Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche11_temperature";
+          SendData(idxDeviceRuche11Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche11_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches11TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "12") {
+          // envoi du poids
+          nomModule = "Ruche12_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche12Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche12_temperature";
+          SendData(idxDeviceRuche12Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche12_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches12TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "13") {
+          // envoi du poids
+          nomModule = "Ruche13_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche13Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche13_temperature";
+          SendData(idxDeviceRuche13Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche13_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches13TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "14") {
+          // envoi du poids
+          nomModule = "Ruche14_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche14Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche14_temperature";
+          SendData(idxDeviceRuche14Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche14_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches14TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "15") {
+          // envoi du poids
+          nomModule = "Ruche15_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche15Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche15_temperature";
+          SendData(idxDeviceRuche15Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche15_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches15TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "16") {
+          // envoi du poids
+          nomModule = "Ruche16_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche16Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche16_temperature";
+          SendData(idxDeviceRuche16Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche16_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches16TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "17") {
+          // envoi du poids
+          nomModule = "Ruche17_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche17Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche17_temperature";
+          SendData(idxDeviceRuche17Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche17_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches17TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "18") {
+          // envoi du poids
+          nomModule = "Ruche18_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche18Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche18_temperature";
+          SendData(idxDeviceRuche18Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche18_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches18TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "19") {
+          // envoi du poids
+          nomModule = "Ruche19_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche19Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche19_temperature";
+          SendData(idxDeviceRuche19Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche19_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches19TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        }
+        /*else if (Ruche.numRuche == "1") {
+            // envoi du poids
+            SendData(idxDeviceRuche1Poids, "Ruche1_poids", Ruche.poids.c_str(), 0); // Envoi des donnees via JSON et MQTT
+            // envoi de la temperature
+            SendData(idxDeviceRuche1Temperature, "Ruche1_temperature", Ruche.tempeDs18b20.c_str(), 0); // Envoi des données via JSON et MQTT
+            // envoi de la tension de la baterrie
+            SendData(idxDeviceRuches1TensionBatterie, "Ruche1_batterie_tension", Ruche.vBat.c_str(), 0); // Envoi des données via JSON et MQTT
+          }*/
+#endif
       }
+      // il manque des messages dans domoticz, donc
+      clientMqtt.disconnect();
+      Serial.println("MQTT disconnect");
     }
 #endif
+
+    // envoi des donnees vers thingspeak
+    if (SECRET_THINGSPEAK_TRUE and SECRET_WIFI_TRUE) {
+      thinkspeak();
+    }
   }
   // reset esp32 intervals reguliers
   unsigned long ceMoment = millis();  // now
@@ -860,7 +1396,7 @@ void loop() {
 //======
 void setup_wifi() {
   // WiFi.mode(WIFI_AP_STA) // station et point d'acces
-  WiFi.mode(WIFI_STA); // mode de connection wifi : station
+  WiFi.mode(WIFI_STA);  // mode de connection wifi : station
 
   // wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
   // SSID du réseau Wifi et  Mot de passe du réseau Wifi dans le fichier secrets.h
@@ -869,9 +1405,11 @@ void setup_wifi() {
   wifiMulti.addAP(SECRET_SSID2, SECRET_PASS2);
   wifiMulti.addAP(SECRET_SSID3, SECRET_PASS3);
   wifiMulti.addAP(SECRET_SSID4, SECRET_PASS4);
+  //wifiMulti.addAP(SECRET_SSID5, SECRET_PASS5);
 #elif LOIC
   wifiMulti.addAP(SECRET_SSID1, SECRET_PASS1);
   wifiMulti.addAP(SECRET_SSID2, SECRET_PASS2);
+  //wifiMulti.addAP(SECRET_SSID5, SECRET_PASS5);
 #endif
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();
@@ -929,7 +1467,12 @@ void connect_wifi() {
     display.display();
     delay(100);
 #endif
-  }  else {
+  } else {
+    display.setCursor(0, 10);
+    display.print("IP Adr: ");
+    display.setCursor(40, 10);
+    display.print("    no wifi   ");
+    display.display();
     if (debug) {
       Serial.println("WiFi not connected!");
       delay(100);
@@ -978,7 +1521,7 @@ void reconnect() {
       // Connexion effectuee, publication d'un message...
       String message = "Connexion MQTT de " + nomModule + " reussi sous reference technique : " + clientId + ".";
       // String message = "Connexion MQTT de "+ nomModule + " reussi.";
-      StaticJsonDocument<256> doc; // v6
+      StaticJsonDocument<256> doc;  // v6
       // On renseigne les variables.
       doc["command"] = "addlogmessage";
       doc["message"] = message;
@@ -986,7 +1529,7 @@ void reconnect() {
       String messageOut;
       if (serializeJson(doc, messageOut) == 0) {
         Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
-      } else  {
+      } else {
         // Convertion du message en Char pour envoi dans les Log Domoticz.
         char messageChar[messageOut.length() + 1];
         messageOut.toCharArray(messageChar, messageOut.length() + 1);
@@ -1004,28 +1547,28 @@ void reconnect() {
 }
 
 // envoi des donnes avec l'idx de domoticz en fonction des sondes
-void SendData (int idxDevice, String description, const char* chaine) {
+void SendData(int idxDevice, String description, const char* chaine, int nvalue) {
   // Creation et Envoi de la donnee JSON.
-  StaticJsonDocument<256> doc; // v6
+  StaticJsonDocument<256> doc;  // v6
   // On renseigne les variables.
-  doc["ip"]      = adresse_ip;
+  doc["ip"] = adresse_ip;
   doc["descrip"] = nomModule;
-  doc["type"]    = "command";
-  doc["param"]   = "udevice";
-  doc["idx"]     = idxDevice;
-  doc["nvalue"]  = 0;
-  doc["svalue"]  = chaine;
+  doc["type"] = "command";
+  doc["param"] = "udevice";
+  doc["idx"] = idxDevice;
+  doc["nvalue"] = nvalue;
+  doc["svalue"] = chaine;
   // On serialise la variable JSON
   String messageOut;
   if (serializeJson(doc, messageOut) == 0) {
     Serial.println("Erreur lors de la creation du message de connexion pour Domoticz");
-  } else  {
+  } else {
     // Convertion du message en Char pour envoi dans les Log Domoticz.
     char messageChar[messageOut.length() + 1];
     messageOut.toCharArray(messageChar, messageOut.length() + 1);
     clientMqtt.publish(topicOut, messageChar);
     if (debug) {
-      Serial.println("Message envoye a Domoticz");
+      Serial.print("Message envoye a Domoticz : ");
       Serial.println(messageChar);
     }
   }
