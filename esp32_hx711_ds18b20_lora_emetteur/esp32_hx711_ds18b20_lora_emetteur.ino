@@ -579,6 +579,9 @@ void getReadings() {
   Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
   //delay(300);
   //RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+  if (RUCHE_NUMERO == 07) {
+    Ruche.poids = Ruche.poids - ((20 - Ruche.tempe) / 10);  // pour corriger le default de la ruche N07, 0.1kg par degres de temperature a partir de 20°C
+  }
 
   // test + ou - poidsAberrant pour eviter les mesure aberrantes
   //if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
