@@ -78,7 +78,7 @@ float calibration_factor = -20000;       // calibration factor    -20000
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
-float calibration_factor = -22000;       // calibration factor   -22000
+float calibration_factor = -21800;       // calibration factor   -21800
 
 
 #elif RUCHE_NUMERO == 11
@@ -145,7 +145,7 @@ const long LOADCELL_OFFSET = -78000;        // offset -78000
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
-const long LOADCELL_OFFSET = -43370;        // offset -43370
+const long LOADCELL_OFFSET = -40572;        // offset -40572
 
 
 #elif RUCHE_NUMERO == 11
