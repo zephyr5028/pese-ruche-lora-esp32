@@ -539,33 +539,6 @@ byte getTemperature(float *temperature, byte reset_search) {
 // Read sensors
 //==============
 void getReadings() {
-  // lecture du poids de la ruche
-  delay(100);
-  Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
-  //delay(300);
-  //RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-
-  // test + ou - poidsAberrant pour eviter les mesure aberrantes
-  //if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
-  if ((Ruche.poids > (Ruche.poids + poidsAberrant)) or (Ruche.poids < (Ruche.poids - poidsAberrant))) {
-    delay(200);
-    Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
-  }
-  /* else {
-    delay(300);
-    RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-    delay(300);
-    Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-    if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
-      delay(200);
-      Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-    } else {
-      delay(300);
-      Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
-    }
-  }
-  */
-
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&Ruche.tempe, true) != READ_OK) {
     if (SerialMonitor) {
@@ -600,6 +573,33 @@ void getReadings() {
     }
     */
   }
+
+  // lecture du poids de la ruche
+  delay(100);
+  Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
+  //delay(300);
+  //RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+
+  // test + ou - poidsAberrant pour eviter les mesure aberrantes
+  //if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
+  if ((Ruche.poids > (Ruche.poids + poidsAberrant)) or (Ruche.poids < (Ruche.poids - poidsAberrant))) {
+    delay(200);
+    Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
+  }
+  /* else {
+    delay(300);
+    RucheControl.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+    delay(300);
+    Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+    if ((Ruche.poids > (RucheControl.poids + poidsAberrant)) or (Ruche.poids < (RucheControl.poids - poidsAberrant ))) {
+      delay(200);
+      Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+    } else {
+      delay(300);
+      Ruche.poids = scale.get_units(numberOfReadings); // numberOfReadings readings from the ADC minus tare weight
+    }
+  }
+  */
 
   //----------------------
   // ruche jlm autonome
