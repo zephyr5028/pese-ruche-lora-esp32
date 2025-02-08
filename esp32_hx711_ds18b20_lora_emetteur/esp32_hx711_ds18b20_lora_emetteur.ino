@@ -35,7 +35,7 @@
 
 //Libraries for DS18B20
 #include <OneWire.h>  //Librairie du bus OneWire
-//#include <DallasTemperature.h>
+#include <DallasTemperature.h>
 
 //Libraries for LoRa
 #include <SPI.h>
@@ -89,20 +89,11 @@ ruche RucheControl = { .numRuche = RUCHE_NUMERO, .poids = 0.00, .tempe = 0.00, .
 //=========
 // DB18B20
 //=========
-/*
-  // Data wire is plugged into port 2 on the Arduino
-  #define ONE_WIRE_BUS 2
-
-  // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-  OneWire oneWire(ONE_WIRE_BUS);
-
-  // Pass our oneWire reference to Dallas Temperature.
-  DallasTemperature sensors(&oneWire);
-*/
 // Broche du bus 1-Wire pour la sonde temperature ds18b20
 #define ONEWIRE_BUS 17            // Pin de connexion des sondes DS18B20
 #define TEMPERATURE_PRECISION 12  // precision convertisseur ad du ds18b20 (9 à 12)
 const int DS18B20_ID = 0x28;      // debut de l'adresse d'une sonde ds18b20
+float temp_ds18b20;               // Temperature value ds18b20
 
 // Code de retour de la fonction getTemperature()
 enum DS18B20_RCODES {
@@ -116,10 +107,126 @@ enum DS18B20_RCODES {
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 // 4.7K resistor is necessary between +3.3V ou 5v and Data wire
 OneWire ds18b20(ONEWIRE_BUS);
+// Pass our oneWire reference to Dallas Temperature.
+DallasTemperature sensors(&ds18b20);
+int num_sensors;  // Create variables to hold the device addresses
 byte i;
 byte type_s;
 byte data[12];
 byte addr[8];
+
+//========
+// sondes
+//========
+// Tableaux contenant l'adresse de chaque sonde OneWire | arrays to hold device addresses
+DeviceAddress sensorDeviceAddress;  //Vérifie la compatibilité des capteurs avec la librairie
+DeviceAddress sonde_depart = { 0x28, 0xAF, 0x58, 0x75, 0xD0, 0x1, 0x3C, 0x24 };
+DeviceAddress sonde_retour = { 0x28, 0x10, 0xE, 0x75, 0xD0, 0x1, 0x3C, 0xE };
+DeviceAddress sonde_outsideThermometer = { 0x28, 0xF4, 0xBC, 0x26, 0x0, 0x0, 0x80, 0x2B };
+DeviceAddress sonde_cave_exterieure = { 0x28, 0x38, 0x34, 0x75, 0xD0, 0x1, 0x3C, 0x20 };
+DeviceAddress sonde_exterieure = { 0x28, 0x7C, 0x26, 0x75, 0xD0, 0x1, 0x3C, 0x76 };
+DeviceAddress sonde_cave_semis = { 0x28, 0xC1, 0x6C, 0x76, 0xE0, 0x1, 0x3C, 0x39 };
+DeviceAddress sonde_sdb_etage = { 0x28, 0xE4, 0x29, 0x76, 0xE0, 0x1, 0x3C, 0x5F };
+DeviceAddress sonde_bureau = { 0x28, 0xE2, 0xC8, 0x75, 0xD0, 0x1, 0x3C, 0xAC };
+
+//================
+//scanner oneWire
+//================
+void OneWireScanner() {
+  // nbr locate devices on the bus
+  Serial.print("Locating devices...");
+  Serial.print("Found ");
+  num_sensors = sensors.getDeviceCount();
+  Serial.print(num_sensors);
+  Serial.println(" device(s).");
+
+  // lecture de la rom du ds18b20
+  while (ds18b20.search(addr)) {
+    delay(200);
+    Serial.print("ROM = ");
+    for (i = 0; i < 8; i++) {
+      Serial.write(' ');
+      Serial.print("0x");
+      Serial.print(addr[i], HEX);
+      if (i != 7) {
+        Serial.print(", ");
+      }
+    }
+    if (OneWire::crc8(addr, 7) != addr[7]) {
+      Serial.println("CRC is not valid!");
+      return;
+    }
+    Serial.println();
+
+    // the first ROM byte indicates which chip
+    switch (addr[0]) {
+      case 0x10:
+        Serial.println("Chip = DS18S20");  // or old DS1820
+        type_s = 1;
+        break;
+      case 0x28:
+        Serial.println("Chip = DS18B20");
+        type_s = 0;
+        break;
+      case 0x22:
+        Serial.println("Chip = DS1822");
+        type_s = 0;
+        break;
+      default:
+        Serial.println("Device is not a DS18x20 family device.");
+        break;
+    }
+  }
+  Serial.println("No more addresses.");
+  ds18b20.reset_search();
+  return;
+}
+
+//=============================
+// device ds18b20 is connected
+//=============================
+void deviceConnected(DeviceAddress deviceAddress, String descript_sonde) {
+  // check if Device ds18b20 is connected
+  if (!sensors.isConnected(deviceAddress)) {
+    Serial.print("Unable to find device sonde ");
+    Serial.println(descript_sonde);
+  } else {
+    // set the resolution to 9 at 12 bit per device
+    sensors.setResolution(deviceAddress, TEMPERATURE_PRECISION);
+    // On vérifie que le capteur est correctement configure | Check that ensor is correctly configured
+    Serial.print("Resolution device ");
+    Serial.print(descript_sonde);
+    Serial.print(" : ");
+    Serial.print(sensors.getResolution(deviceAddress), DEC);
+    Serial.println();
+  }
+}
+
+//====================
+// Releves des sondes
+//====================
+// releves des sondes ds18b20
+void getSondes_ds18b20(DeviceAddress deviceAddress) {
+  sensors.requestTemperatures();  // New temperature readings
+  //temp_ds18b20 = sensors.getTempCByIndex(deviceAddress); // Temperature in Celsius degrees
+  temp_ds18b20 = sensors.getTempC(deviceAddress);  // Temperature in Celsius degrees
+  // Uncomment the next line to set temperature in Fahrenheit
+  // temp = sensors.getTempFByIndex(0);
+
+  if (debug) {
+    Serial.print("device address ds18b20 : 0x");
+    Serial.println(deviceAddress[7], HEX);
+    Serial.print("temperature Celsius DS18B20 : ");
+    Serial.println(temp_ds18b20);
+  }
+}
+
+struct capteur_ds18b20 {
+  String tempe;  // temperature
+};
+// objets
+capteur_ds18b20 Capteur_ds18b20_depart = { .tempe = "" };
+capteur_ds18b20 Capteur_ds18b20_retour = { .tempe = "" };
 
 //----------------------
 // ruche jlm autonome
@@ -588,6 +695,9 @@ void getReadings() {
   if ((Ruche.poids > (Ruche.poids + poidsAberrant)) or (Ruche.poids < (Ruche.poids - poidsAberrant))) {
     delay(200);
     Ruche.poids = scale.get_units(numberOfReadings);  // numberOfReadings readings from the ADC minus tare weight
+    if (RUCHE_NUMERO == 07) {
+      Ruche.poids = Ruche.poids - ((20 - Ruche.tempe) / 10);  // pour corriger le default de la ruche N07, 0.1kg par degres de temperature a partir de 20°C
+    }
   }
   /* else {
     delay(300);
@@ -922,15 +1032,17 @@ void setup() {
 
   Serial.begin(SERIAL_BAUD);
   pinMode(AnGpio, INPUT);  // anGpio lecture de la tension de la batterie
-  //pinMode(LED_BOARD,OUTPUT); // led de la carte
-  /*
-    // Start up the library
-    sensors.begin();                            // On initialise la bibliothèque Dallas
-    // report parasite power requirements
-    Serial.print("Parasite power is: ");
-    if (sensors.isParasitePowerMode()) Serial.println("ON");
-    else Serial.println("OFF");
-  */
+                           //pinMode(LED_BOARD,OUTPUT); // led de la carte
+
+  // Start up the library
+  sensors.begin();  // On initialise la bibliothèque Dallas
+  // report parasite power requirements
+  Serial.print("Parasite power is: ");
+  if (sensors.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
+
+  // affiche les adresses des devices du bus oneWire
+  OneWireScanner();
 
   // initialisation load cell
   scale.begin(DOUT, CLK);  // loadcell hx711 broches DOUT et CLK

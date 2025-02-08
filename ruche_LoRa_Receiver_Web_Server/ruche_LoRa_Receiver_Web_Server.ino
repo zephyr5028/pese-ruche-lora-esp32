@@ -1405,11 +1405,12 @@ void setup_wifi() {
   wifiMulti.addAP(SECRET_SSID2, SECRET_PASS2);
   wifiMulti.addAP(SECRET_SSID3, SECRET_PASS3);
   wifiMulti.addAP(SECRET_SSID4, SECRET_PASS4);
-  //wifiMulti.addAP(SECRET_SSID5, SECRET_PASS5);
+  wifiMulti.addAP(SECRET_SSID5, SECRET_PASS5);
 #elif LOIC
   wifiMulti.addAP(SECRET_SSID1, SECRET_PASS1);
   wifiMulti.addAP(SECRET_SSID2, SECRET_PASS2);
-  //wifiMulti.addAP(SECRET_SSID5, SECRET_PASS5);
+  wifiMulti.addAP(SECRET_SSID3, SECRET_PASS3);
+  //wifiMulti.addAP(SECRET_SSID4, SECRET_PASS4);
 #endif
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();

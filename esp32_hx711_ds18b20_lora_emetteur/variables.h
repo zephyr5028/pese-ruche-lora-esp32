@@ -9,6 +9,7 @@
 #define SERIAL_BAUD 115200    // vitesse moniteur serie
 #define SerialMonitor  1      // 1 true, 0 false
 #define oled  0               // oled 1 : afficheur present
+#define debug 1               // true for use Display log message
 
 //=============
 //Numero Ruche
