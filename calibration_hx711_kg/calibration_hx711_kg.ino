@@ -38,7 +38,7 @@ HX711 loadcell;   // objet loadcell
 // pour le reglage de la calibration puis de l'offset
 // pour le reglage de la correction batterie
 bool calibration = 0 ;                 // 1 = reglage calibration et 0 = reglage offset
-bool batterie = 0 ;                    // 1 = reglage de la correction batterie et 0 calibration / offset
+bool batterie = 1 ;                    // 1 = reglage de la correction batterie et 0 calibration / offset
 //#define BAT  12             // tension batterie 12v
 #define BAT  5                // tension batterie 5v
 

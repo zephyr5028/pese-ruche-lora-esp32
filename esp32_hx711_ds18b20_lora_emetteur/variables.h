@@ -20,7 +20,7 @@
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
-#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+//#define RUCHE_NUMERO  07      // numero de la ruche jlm7
 
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
@@ -31,6 +31,9 @@
 //#define RUCHE_NUMERO  17      // numero de la ruche loic7
 //#define RUCHE_NUMERO  18      // numero de la ruche loic8
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
+//#define RUCHE_NUMERO  21      // numero de la ruche loic10
+//#define RUCHE_NUMERO  22      // numero de la ruche loic11
+#define RUCHE_NUMERO  23      // numero de la ruche loic12
 
 //=======
 //TPL5110
@@ -117,6 +120,18 @@ float calibration_factor = -20500;       // calibration factor   -19800
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
 float calibration_factor = -20200;       // calibration factor   -20500
+
+#elif RUCHE_NUMERO == 21
+// pour ruche loic10 rfm95
+float calibration_factor = -21300;       // calibration factor   -221300
+
+#elif RUCHE_NUMERO == 22
+// pour ruche loic11 rfm95
+float calibration_factor = -17800;       // calibration factor   -17800
+
+#elif RUCHE_NUMERO == 23
+// pour ruche loic12 rfm95
+float calibration_factor = -18400;       // calibration factor   -18400
 #endif
 
 // offset
@@ -184,6 +199,17 @@ const long LOADCELL_OFFSET = -78300;      // offset   -86750
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
 const long LOADCELL_OFFSET = -59140;      // offset   -95850
+
+#elif RUCHE_NUMERO == 21
+// pour ruche loic10 rfm95
+const long LOADCELL_OFFSET = -183385;      // offset   -183385
+#elif RUCHE_NUMERO == 22
+// pour ruche loic11 rfm95
+const long LOADCELL_OFFSET = -160615;      // offset   -160615
+
+#elif RUCHE_NUMERO == 23
+// pour ruche loic12 rfm95
+const long LOADCELL_OFFSET = -117222;      // offset   -117222
 #endif
 
 //==============
@@ -239,6 +265,15 @@ const long LOADCELL_OFFSET = -59140;      // offset   -95850
 
 #elif RUCHE_NUMERO == 19
 #define TIME_TO_SLEEP   607    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 21
+#define TIME_TO_SLEEP   601    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 22
+#define TIME_TO_SLEEP   613    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 23
+#define TIME_TO_SLEEP   617    // Time ESP32 will go to sleep (in seconds)
 #endif
 
 //----------------------
@@ -470,6 +505,36 @@ const int tensionElevee = 16;         // tension elevee
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
 float correction = -2.50 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
+
+#elif RUCHE_NUMERO == 21
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -1.00 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
+
+#elif RUCHE_NUMERO == 22
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -2.35 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+const int tensionFaible = 10;         // tension faible
+const int tensionElevee = 16;         // tension elevee
+
+#elif RUCHE_NUMERO == 23
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -2.05 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 const int tensionFaible = 10;         // tension faible

@@ -1327,6 +1327,66 @@ void loop() {
           if (bat > (int)bat) {
             SendData(idxDeviceRuches19TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
           }
+        } else if (Ruche.numRuche == "21") {
+          // envoi du poids
+          nomModule = "Ruche21_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche21Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche21_temperature";
+          SendData(idxDeviceRuche21Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche21_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches21TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "22") {
+          // envoi du poids
+          nomModule = "Ruche22_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche22Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche22_temperature";
+          SendData(idxDeviceRuche22Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche22_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches22TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+        } else if (Ruche.numRuche == "23") {
+          // envoi du poids
+          nomModule = "Ruche23_poids";
+          // convert string to float
+          float poids = atof(Ruche.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceRuche23Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+          }
+          // envoi de la temperature
+          nomModule = "Ruche23_temperature";
+          SendData(idxDeviceRuche23Temperature, nomModule, Ruche.tempeDs18b20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la baterrie
+          nomModule = "Ruche23_batterie_tension";
+          // convert string to float
+          float bat = atof(Ruche.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceRuches23TensionBatterie, nomModule, Ruche.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
         }
         /*else if (Ruche.numRuche == "1") {
             // envoi du poids

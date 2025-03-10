@@ -19,7 +19,7 @@
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm6 autonome
-#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+//#define RUCHE_NUMERO  07      // numero de la ruche jlm7
 
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
@@ -30,6 +30,9 @@
 //#define RUCHE_NUMERO  17      // numero de la ruche loic7
 //#define RUCHE_NUMERO  18      // numero de la ruche loic8
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
+//#define RUCHE_NUMERO  21      // numero de la ruche loic10
+//#define RUCHE_NUMERO  22      // numero de la ruche loic11
+#define RUCHE_NUMERO  23      // numero de la ruche loic12
 
 
 //=====================
@@ -109,6 +112,18 @@ float calibration_factor = -20500;       // calibration factor   -20500
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
 float calibration_factor = -20500;       // calibration factor   -20500
+
+#elif RUCHE_NUMERO == 21
+// pour ruche loic10 rfm95
+float calibration_factor = -21300;       // calibration factor   -21300
+
+#elif RUCHE_NUMERO == 22
+// pour ruche loic11 rfm95
+float calibration_factor = -17800;       // calibration factor   -17800
+
+#elif RUCHE_NUMERO == 23
+// pour ruche loic12 rfm95
+float calibration_factor = -18400;       // calibration factor   -18400
 #endif
 
 // offset
@@ -175,6 +190,18 @@ long LOADCELL_OFFSET = -78300;      // offset   -78300
 #elif RUCHE_NUMERO == 19
 // pour ruche loic9 rfm95
 long LOADCELL_OFFSET = -95850;      // offset   -95850
+
+#elif RUCHE_NUMERO == 21
+// pour ruche loic10 rfm95
+long LOADCELL_OFFSET = -183385;      // offset   -183385
+
+#elif RUCHE_NUMERO == 22
+// pour ruche loic11 rfm95
+long LOADCELL_OFFSET = -160615;      // offset   -160615
+
+#elif RUCHE_NUMERO == 23
+// pour ruche loic12 rfm95
+long LOADCELL_OFFSET = -117222;      // offset   -117222
 #endif
 
 //====================
@@ -330,6 +357,30 @@ float tensionDiode = 0.74 ;           // tension de la diode de protection inver
 int R1 = 100000;                      // resistance r1 du pont
 int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.35 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
+#elif RUCHE_NUMERO == 21
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -1.0 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
+#elif RUCHE_NUMERO == 22
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -2.35 ;            // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
+#elif RUCHE_NUMERO == 23
+// batterie 12v
+int R1 = 100000;                      // resistance r1 du pont
+int R2 = 22000;                       // resistance r2 du pont
+float correction = -2.05 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 #endif
