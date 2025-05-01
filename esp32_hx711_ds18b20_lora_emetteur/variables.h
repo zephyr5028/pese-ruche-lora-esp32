@@ -19,7 +19,7 @@
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
-//#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
+#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  07      // numero de la ruche jlm7
 
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
@@ -33,7 +33,7 @@
 //#define RUCHE_NUMERO  19      // numero de la ruche loic9
 //#define RUCHE_NUMERO  21      // numero de la ruche loic10
 //#define RUCHE_NUMERO  22      // numero de la ruche loic11
-#define RUCHE_NUMERO  23      // numero de la ruche loic12
+//#define RUCHE_NUMERO  23      // numero de la ruche loic12
 
 //=======
 //TPL5110
@@ -233,7 +233,7 @@ const long LOADCELL_OFFSET = -117222;      // offset   -117222
 #define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 06
-#define TIME_TO_SLEEP   61    // Time ESP32 will go to sleep (in seconds)
+#define TIME_TO_SLEEP   331    // Time ESP32 will go to sleep (in seconds)
 
 #elif RUCHE_NUMERO == 07
 #define TIME_TO_SLEEP   587    // Time ESP32 will go to sleep (in seconds)
@@ -331,9 +331,7 @@ float alt = 0.0;                                      // altitude pour les calcu
 // chaine (tableau de caracteres) pour l'envoi des données des sondes
 const int taille = 30;                                // taille du tableau pour l'envoi des valeurs des sondes
 char chaine[taille - 1] = "" ;                        // tableau pour l'envoi des valeurs des sondes
-int num_sensors;                                      // Create variables to hold the device addresses
 #endif
-
 
 //====================
 // Temperature ds18b20
@@ -403,11 +401,11 @@ const int tensionElevee = 7;          // tension elevee
 // batterie 5v autonome
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
-float correction = -0.15;             // correction
+float correction = -0.35;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
-const int tensionFaible = 3;          // tension faible
-const int tensionElevee = 7;         // tension elevee
+const int tensionFaible = 4.7;        // tension faible
+const int tensionElevee = 6;          // tension elevee
 
 #elif RUCHE_NUMERO == 07
 // batterie 12v
