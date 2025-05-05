@@ -154,3 +154,19 @@ const String App = "Thingspeak";  //  alternative is line above
 //measured battery voltage/ADC reading
 //#define batteryCalFactor .001167
 #define batteryCalFactor .0010158
+
+//=======================================
+// tableau des poids pour suivi essaimage
+//=======================================
+float tableauIdxLora [7] [10] = { // declaration numero ruche et index envoi lora
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 1
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 2
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 3
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 4 
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 5
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 6
+{0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0}, // ruche 7
+}; // fin du tableau
+
+float ecart = 1.5; // 1.5kg poids mini essaim
+
