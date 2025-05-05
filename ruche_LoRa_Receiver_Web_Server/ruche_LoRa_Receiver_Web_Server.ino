@@ -1162,6 +1162,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche11Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche11_temperature";
@@ -1182,6 +1183,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche12Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche12_temperature";
@@ -1202,6 +1204,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche13Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche13_temperature";
@@ -1222,6 +1225,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche14Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche14_temperature";
@@ -1242,6 +1246,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche15Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche15_temperature";
@@ -1262,6 +1267,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche16Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche16_temperature";
@@ -1282,6 +1288,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche17Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche17_temperature";
@@ -1302,6 +1309,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche18Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche18_temperature";
@@ -1322,6 +1330,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche19Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche19_temperature";
@@ -1342,6 +1351,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche21Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche21_temperature";
@@ -1362,6 +1372,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche22Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche22_temperature";
@@ -1382,6 +1393,7 @@ void loop() {
           // pour eliminer les valeurs sans decimales
           if (poids > (int)poids) {
             SendData(idxDeviceRuche23Poids, nomModule, Ruche.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
           }
           // envoi de la temperature
           nomModule = "Ruche23_temperature";
@@ -1427,6 +1439,11 @@ void loop() {
 
 void essaimage(float poids) {
   int ruche = atof(Ruche.numRuche.c_str());
+  if (ruche > 9 and ruche < 20) {
+    ruche = ruche - 10;  // pour ruche loic entre 11 et 19
+  } else if (ruche > 20 and ruche < 30) {
+    ruche = ruche - 11;  // pour ruches loic entre 21 et 29
+  }
   int idx = atof(readingID.c_str());
   float poids_anterieur;  // poids lecture precedente
   // verification essaimage
@@ -1444,9 +1461,13 @@ void essaimage(float poids) {
   }
   if ((poids_anterieur > 0.0) and (poids_anterieur - poids > ecart)) {  // ecart represente le poids mini d'un essaim
     nomModule = "alerte_essaimage_ruche";
-    SendData(idxDeviceAlerteRuchesPoids, nomModule, Ruche.numRuche.c_str(), 1);  // Envoi des donnees via JSON et MQTT - alerte si 1
+    int level = 1;                                                                             // alerte Level = (0=gray, 1=green, 2=yellow, 3=orange, 4=red)
+    SendData(idxDeviceAlerteEssaimageRuchesPoids, nomModule, Ruche.numRuche.c_str(), level);   // Envoi des donnees via JSON et MQTT - Level = (0=gray, 1=green, 2=yellow, 3=orange, 4=red)
+    SendData(idxDeviceAlerteEssaimageRuchesSwitch, nomModule, Ruche.numRuche.c_str(), level);  // Envoi des donnees via JSON et MQTT - alerte 1
   } else {
-    SendData(idxDeviceAlerteRuchesPoids, nomModule, Ruche.numRuche.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+    int level = 0;                                                                             // alerte Level = (0=gray, 1=green, 2=yellow, 3=orange, 4=red)
+    SendData(idxDeviceAlerteEssaimageRuchesPoids, nomModule, Ruche.numRuche.c_str(), level);   // Envoi des donnees via JSON et MQTT - Level = (0=gray, 1=green, 2=yellow, 3=orange, 4=red)
+    SendData(idxDeviceAlerteEssaimageRuchesSwitch, nomModule, Ruche.numRuche.c_str(), level);  // Envoi des donnees via JSON et MQTT - pas d'alerte
   }
 }
 
