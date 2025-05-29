@@ -19,8 +19,9 @@
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
-#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
+//#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+#define RUCHE_NUMERO  8      // numero de la ruche jlm8 autonome
 
 //#define RUCHE_NUMERO  11      // numero de la ruche loic1
 //#define RUCHE_NUMERO  12      // numero de la ruche loic2
@@ -83,6 +84,10 @@ float calibration_factor = -20000;       // calibration factor    -20000
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
 float calibration_factor = -21800;       // calibration factor   -21800
+
+#elif RUCHE_NUMERO == 8
+// pour ruche jlm8 rfm95 autonome
+float calibration_factor = -20000;       // calibration factor    -20000
 
 
 #elif RUCHE_NUMERO == 11
@@ -163,6 +168,10 @@ const long LOADCELL_OFFSET = -78000;        // offset -78000
 // pour ruche jlm7 rfm95
 const long LOADCELL_OFFSET = -40572;        // offset -40572
 
+#elif RUCHE_NUMERO == 8
+// pour ruche jlm8 rfm95 autonome
+const long LOADCELL_OFFSET = -78000;        // offset -78000
+
 
 #elif RUCHE_NUMERO == 11
 // pour ruche loic1 rfm95
@@ -215,7 +224,7 @@ const long LOADCELL_OFFSET = -117222;      // offset   -117222
 //==============
 //Time to Sleep
 //==============
-// nombres premiers 41, 61 , 127, 181, 241, 307, 313, 331, 601, 607, 613, 617, 619, 631, 907
+// nombres premiers 41, 61 , 127, 181, 241, 307, 313, 331, 337, 347, 601, 607, 613, 617, 619, 631, 907
 // nombres premiers 577, 587, 593, 599, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701
 #if RUCHE_NUMERO == 01
 #define TIME_TO_SLEEP   331    // Time ESP32 will go to sleep (in seconds)
@@ -237,6 +246,9 @@ const long LOADCELL_OFFSET = -117222;      // offset   -117222
 
 #elif RUCHE_NUMERO == 07
 #define TIME_TO_SLEEP   587    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 8
+#define TIME_TO_SLEEP   337    // Time ESP32 will go to sleep (in seconds)
 
 
 #elif RUCHE_NUMERO == 11
@@ -279,7 +291,7 @@ const long LOADCELL_OFFSET = -117222;      // offset   -117222
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
 //==================================
 // structure de donnees des Capteurs
 //==================================
@@ -314,6 +326,8 @@ struct capteur_bme280 {
 #if RUCHE_NUMERO == 05
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #elif RUCHE_NUMERO == 06
+#define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
+#elif RUCHE_NUMERO == 8
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #endif
 float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
@@ -416,6 +430,16 @@ float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 const int tensionFaible = 10;         // tension faible
 const int tensionElevee = 16;         // tension elevee
+
+#elif RUCHE_NUMERO == 8
+// batterie 5v autonome
+int R1 = 27000;                       // resistance r1 du pont
+int R2 = 10000;                       // resistance r2 du pont
+float correction = -0.35;             // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
+const int tensionFaible = 4.7;        // tension faible
+const int tensionElevee = 6;          // tension elevee
 
 
 #elif RUCHE_NUMERO == 11

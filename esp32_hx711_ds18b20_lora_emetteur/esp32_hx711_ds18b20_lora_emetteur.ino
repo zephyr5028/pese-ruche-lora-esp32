@@ -58,7 +58,7 @@ HX711 scale;  // objet scale
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
 
@@ -231,7 +231,7 @@ capteur_ds18b20 Capteur_ds18b20_retour = { .tempe = "" };
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
 //=========
 // BME280
 //=========
@@ -487,7 +487,7 @@ void sendReadings() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
   // message a envoyer
   LoRaMessage = String(counterID) + "/" + String(BoitierCapteur.tempeDS18B20) + "&" + String(BoitierCapteur.numBoitierCapteur) + "#" + String(BoitierCapteur.poids) + "{" + String(BoitierCapteur.vBat) + "}" + Capteur_bme280.tempe + "(" + Capteur_bme280.pression + ")" + Capteur_bme280.humi + "@" + BoitierCapteur.nameBoitierCapteur + "~" + String(hum_stat) + "^" + String(bar_for) + "!" + String(BoitierCapteur.interrupteur);
 
@@ -717,7 +717,7 @@ void getReadings() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
   float BoitierCapteurControlTempeDS18B20 = 0.0;  // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -805,7 +805,7 @@ void getReadings() {
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
 //=============
 // Read BME280
 //=============
@@ -1075,7 +1075,7 @@ void setup() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
   if (!bme280.begin(ADDRESS)) {  // initialisation si bme280 present. 0x76 adresse i2c bme280
     if (SerialMonitor) {
       Serial.println("Could not find a valid BME280 sensor, check wiring!");
@@ -1102,7 +1102,7 @@ void setup() {
   //----------------------
   // ruche jlm autonome
   //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(100);
