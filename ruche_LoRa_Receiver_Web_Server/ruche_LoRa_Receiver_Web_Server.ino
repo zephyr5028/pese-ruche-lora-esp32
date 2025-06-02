@@ -1150,6 +1150,41 @@ void loop() {
           } else {                                                                                       // interrupteur ferme nvalue a 1 ferme
             SendData(idxDeviceCapteurRuche6Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 1);  // Envoi des données via JSON et MQTT
           }
+
+        } else if (BoitierCapteurs.numero == "8") {
+          // envoi du poids
+          nomModule = "Capteur_Ruche8_poids";
+          // convert string to float
+          float poids = atof(BoitierCapteurs.poids.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (poids > (int)poids) {
+            SendData(idxDeviceCapteurRuche8Poids, nomModule, BoitierCapteurs.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
+            essaimage(poids);
+          }
+          // envoi de la temperature du ds18b20
+          nomModule = "Capteur_Ruche8_temperature_ds18b20";
+          SendData(idxDeviceCapteurRuche8TemperatureDS18B20, nomModule, BoitierCapteurs.tempeDS18B20.c_str(), 0);  // Envoi des données via JSON et MQTT
+          // envoi de la tension de la batterie
+          nomModule = "Capteur_Ruche8_tension_batterie";
+          // convert string to float
+          float bat = atof(BoitierCapteurs.vBat.c_str());
+          // pour eliminer les valeurs sans decimales
+          if (bat > (int)bat) {
+            SendData(idxDeviceCapteurRuches8TensionBatterie, nomModule, BoitierCapteurs.vBat.c_str(), 0);  // Envoi des données via JSON et MQTT
+          }
+          // creation d'une chaine avec les donnees de la sonde bme280.
+          chaine[0] = '\0';  // effacement du tableau
+          chaine_bme280();   //creation de la chaine a envoyer pour la sonde du bme280
+          // Envoi de la données via JSON et MQTT
+          nomModule = "Capteurs_Ruche8_BME280";
+          SendData(idxDeviceCapteurRuche8BME280, nomModule, chaine, 0);  // Envoi des données via JSON et MQTT
+          // envoi de la position de l'interrupteur
+          nomModule = "Capteur_Ruche8_Switch";
+          if (BoitierCapteurs.interrupteur == "0") {                                                     // interrupteur ouvert nvalue a 0 ouvert
+            SendData(idxDeviceCapteurRuche8Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 0);  // Envoi des données via JSON et MQTT
+          } else {                                                                                       // interrupteur ferme nvalue a 1 ferme
+            SendData(idxDeviceCapteurRuche8Switch, nomModule, BoitierCapteurs.interrupteur.c_str(), 1);  // Envoi des données via JSON et MQTT
+          }
         }
 
 #elif LOIC
