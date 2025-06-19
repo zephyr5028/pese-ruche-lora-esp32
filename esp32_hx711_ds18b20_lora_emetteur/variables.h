@@ -21,20 +21,22 @@
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  07      // numero de la ruche jlm7
-#define RUCHE_NUMERO  8      // numero de la ruche jlm8 autonome
+//#define RUCHE_NUMERO  8       // numero de la ruche jlm8 autonome si 08, le 0 defini un nombre octal et 08 octal n'est pas correct
 
-//#define RUCHE_NUMERO  11      // numero de la ruche loic1
-//#define RUCHE_NUMERO  12      // numero de la ruche loic2
-//#define RUCHE_NUMERO  13      // numero de la ruche loic3
-//#define RUCHE_NUMERO  14      // numero de la ruche loic4
-//#define RUCHE_NUMERO  15      // numero de la ruche loic5
-//#define RUCHE_NUMERO  16      // numero de la ruche loic6
-//#define RUCHE_NUMERO  17      // numero de la ruche loic7
-//#define RUCHE_NUMERO  18      // numero de la ruche loic8
-//#define RUCHE_NUMERO  19      // numero de la ruche loic9
-//#define RUCHE_NUMERO  21      // numero de la ruche loic10
-//#define RUCHE_NUMERO  22      // numero de la ruche loic11
-//#define RUCHE_NUMERO  23      // numero de la ruche loic12
+//#define RUCHE_NUMERO  11      // numero de la ruche loic11
+//#define RUCHE_NUMERO  12      // numero de la ruche loic12
+//#define RUCHE_NUMERO  13      // numero de la ruche loic13
+//#define RUCHE_NUMERO  14      // numero de la ruche loic14
+//#define RUCHE_NUMERO  15      // numero de la ruche loic15
+//#define RUCHE_NUMERO  16      // numero de la ruche loic16
+//#define RUCHE_NUMERO  17      // numero de la ruche loic17
+//#define RUCHE_NUMERO  18      // numero de la ruche loic18
+//#define RUCHE_NUMERO  19      // numero de la ruche loic19
+//#define RUCHE_NUMERO  21      // numero de la ruche loic21
+//#define RUCHE_NUMERO  22      // numero de la ruche loic22
+//#define RUCHE_NUMERO  23      // numero de la ruche loic23
+#define RUCHE_NUMERO 24      // numero de la ruche loic24 autonome
+
 
 //=======
 //TPL5110
@@ -91,51 +93,55 @@ float calibration_factor = -20000;       // calibration factor    -20000
 
 
 #elif RUCHE_NUMERO == 11
-// pour ruche loic1 rfm95
+// pour ruche loic11 rfm95
 float calibration_factor = -20100;       // calibration factor   -20100
 
 #elif RUCHE_NUMERO == 12
-// pour ruche loic2 rfm95
+// pour ruche loic12 rfm95
 float calibration_factor = -22100;       // calibration factor   -22100
 
 #elif RUCHE_NUMERO == 13
-// pour ruche loic3 rfm95
+// pour ruche loic13 rfm95
 float calibration_factor = -20800;       // calibration factor   -20800
 
 #elif RUCHE_NUMERO == 14
-// pour ruche loic4 rfm95
+// pour ruche loic14 rfm95
 float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 15
-// pour ruche loic5 rfm95
+// pour ruche loic15 rfm95
 float calibration_factor = -20400;       // calibration factor   -20400
 
 #elif RUCHE_NUMERO == 16
-// pour ruche loic6 rfm95
+// pour ruche loic16 rfm95
 float calibration_factor = -22900;       // calibration factor   -22900
 
 #elif RUCHE_NUMERO == 17
-// pour ruche loic7 rfm95
+// pour ruche loic17 rfm95
 float calibration_factor = -19800;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 18
-// pour ruche loic8 rfm95
+// pour ruche loic18 rfm95
 float calibration_factor = -20500;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 19
-// pour ruche loic9 rfm95
+// pour ruche loic19 rfm95
 float calibration_factor = -20200;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 21
-// pour ruche loic10 rfm95
+// pour ruche loic21 rfm95
 float calibration_factor = -21300;       // calibration factor   -221300
 
 #elif RUCHE_NUMERO == 22
-// pour ruche loic11 rfm95
+// pour ruche loic22 rfm95
 float calibration_factor = -17800;       // calibration factor   -17800
 
 #elif RUCHE_NUMERO == 23
-// pour ruche loic12 rfm95
+// pour ruche loic23 rfm95
+float calibration_factor = -18400;       // calibration factor   -18400
+
+#elif RUCHE_NUMERO == 24
+// pour ruche loic24 rfm95 autonome
 float calibration_factor = -18400;       // calibration factor   -18400
 #endif
 
@@ -174,50 +180,54 @@ const long LOADCELL_OFFSET = -78000;        // offset -78000
 
 
 #elif RUCHE_NUMERO == 11
-// pour ruche loic1 rfm95
+// pour ruche loic11 rfm95
 const long LOADCELL_OFFSET = -22680;      // offset   -22680
 
 #elif RUCHE_NUMERO == 12
-// pour ruche loic2 rfm95
+// pour ruche loic12 rfm95
 const long LOADCELL_OFFSET = -125750;     // offset   -125750
 
 #elif RUCHE_NUMERO == 13
-// pour ruche loic3 rfm95
+// pour ruche loic13 rfm95
 const long LOADCELL_OFFSET = -82700;      // offset   -82700
 
 #elif RUCHE_NUMERO == 14
-// pour ruche loic4 rfm95
+// pour ruche loic14 rfm95
 const long LOADCELL_OFFSET = -95850;      // offset   -95650
 
 #elif RUCHE_NUMERO == 15
-// pour ruche loic5 rfm95
+// pour ruche loic15 rfm95
 const long LOADCELL_OFFSET = -139000;     // offset   -139000
 
 #elif RUCHE_NUMERO == 16
-// pour ruche loic6 rfm95
+// pour ruche loic16 rfm95
 const long LOADCELL_OFFSET = -102500;     // offset   -102500
 
 #elif RUCHE_NUMERO == 17
-// pour ruche loic7 rfm95
+// pour ruche loic17 rfm95
 const long LOADCELL_OFFSET = -86750;      // offset   -86750
 
 #elif RUCHE_NUMERO == 18
-// pour ruche loic8 rfm95
+// pour ruche loic18 rfm95
 const long LOADCELL_OFFSET = -78300;      // offset   -86750
 
 #elif RUCHE_NUMERO == 19
-// pour ruche loic9 rfm95
+// pour ruche loic19 rfm95
 const long LOADCELL_OFFSET = -59140;      // offset   -95850
 
 #elif RUCHE_NUMERO == 21
-// pour ruche loic10 rfm95
+// pour ruche loic21 rfm95
 const long LOADCELL_OFFSET = -183385;      // offset   -183385
 #elif RUCHE_NUMERO == 22
-// pour ruche loic11 rfm95
+// pour ruche loic22 rfm95
 const long LOADCELL_OFFSET = -160615;      // offset   -160615
 
 #elif RUCHE_NUMERO == 23
-// pour ruche loic12 rfm95
+// pour ruche loic23 rfm95
+const long LOADCELL_OFFSET = -117222;      // offset   -117222
+
+#elif RUCHE_NUMERO == 24
+// pour ruche loic24 rfm95 autonome
 const long LOADCELL_OFFSET = -117222;      // offset   -117222
 #endif
 
@@ -286,12 +296,15 @@ const long LOADCELL_OFFSET = -117222;      // offset   -117222
 
 #elif RUCHE_NUMERO == 23
 #define TIME_TO_SLEEP   617    // Time ESP32 will go to sleep (in seconds)
+
+#elif RUCHE_NUMERO == 24
+#define TIME_TO_SLEEP   619    // Time ESP32 will go to sleep (in seconds)
 #endif
 
 //----------------------
 // ruche jlm autonome
 //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
 //==================================
 // structure de donnees des Capteurs
 //==================================
@@ -328,6 +341,8 @@ struct capteur_bme280 {
 #elif RUCHE_NUMERO == 06
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #elif RUCHE_NUMERO == 8
+#define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
+#elif RUCHE_NUMERO == 24
 #define COMPENSATION -1.20                            // compensation de la valeur de temperature du bme280
 #endif
 float temp = 0.0;                                     // Variables contenant la valeur de température de la sonde bme280.
@@ -561,4 +576,14 @@ float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
 const int tensionFaible = 10;         // tension faible
 const int tensionElevee = 16;         // tension elevee
+
+#elif RUCHE_NUMERO == 24
+// batterie 5v autonome
+int R1 = 27000;                       // resistance r1 du pont
+int R2 = 10000;                       // resistance r2 du pont
+float correction = -0.35;             // correction
+float offsetCalcule = 0.226;          // offset mesure par voltmetre
+float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
+const int tensionFaible = 4.7;        // tension faible
+const int tensionElevee = 6;          // tension elevee
 #endif

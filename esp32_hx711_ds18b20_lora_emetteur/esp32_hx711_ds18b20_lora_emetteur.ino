@@ -55,10 +55,10 @@
 
 HX711 scale;  // objet scale
 
-//----------------------
-// ruche jlm autonome
-//----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+//----------------------------
+// ruche jlm and loic autonome
+//----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
 // pour sauvegarder donnees a chaque coupure de l'alimentation
 #include <Preferences.h>
 
@@ -228,10 +228,10 @@ struct capteur_ds18b20 {
 capteur_ds18b20 Capteur_ds18b20_depart = { .tempe = "" };
 capteur_ds18b20 Capteur_ds18b20_retour = { .tempe = "" };
 
-//----------------------
-// ruche jlm autonome
-//----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+//----------------------------
+// ruche jlm and loic autonome
+//----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
 //=========
 // BME280
 //=========
@@ -484,10 +484,10 @@ void startLoRA() {
 // Write LoRa Send
 //===============================================
 void sendReadings() {
-  //----------------------
-  // ruche jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+  //----------------------------
+  // ruche jlm and loic autonome
+  //----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
   // message a envoyer
   LoRaMessage = String(counterID) + "/" + String(BoitierCapteur.tempeDS18B20) + "&" + String(BoitierCapteur.numBoitierCapteur) + "#" + String(BoitierCapteur.poids) + "{" + String(BoitierCapteur.vBat) + "}" + Capteur_bme280.tempe + "(" + Capteur_bme280.pression + ")" + Capteur_bme280.humi + "@" + BoitierCapteur.nameBoitierCapteur + "~" + String(hum_stat) + "^" + String(bar_for) + "!" + String(BoitierCapteur.interrupteur);
 
@@ -714,10 +714,10 @@ void getReadings() {
   }
   */
 
-  //----------------------
-  // ruche jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+  //-----------------------------
+  // ruche jlm and loic autonome
+  //-----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
   float BoitierCapteurControlTempeDS18B20 = 0.0;  // si temperature aberrante
   // Lecture de la temperature ambiante a ~1Hz
   if (getTemperature(&BoitierCapteur.tempeDS18B20, true) != READ_OK) {
@@ -802,10 +802,10 @@ void getReadings() {
   }
 }
 
-//----------------------
-// ruche jlm autonome
-//----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+//----------------------------
+// ruche jlm and loic autonome
+//----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
 //=============
 // Read BME280
 //=============
@@ -1072,10 +1072,10 @@ void setup() {
     Serial.println(synchroLora);
   }
 
-  //----------------------
-  // ruche jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+  //----------------------------
+  // ruche jlm and loic autonome
+  //----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
   if (!bme280.begin(ADDRESS)) {  // initialisation si bme280 present. 0x76 adresse i2c bme280
     if (SerialMonitor) {
       Serial.println("Could not find a valid BME280 sensor, check wiring!");
@@ -1099,10 +1099,10 @@ void setup() {
   getReadings();  // lecture des donnees
   //digitalWrite(LED_BOARD, LOW);
 
-  //----------------------
-  // ruche jlm autonome
-  //----------------------
-#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8
+  //----------------------------
+  // ruche jlm and loic autonome
+  //----------------------------
+#if RUCHE_NUMERO == 05 or RUCHE_NUMERO == 06 or RUCHE_NUMERO == 8 or RUCHE_NUMERO == 24
   getSondes_bme280();  // bme280
   chaine_bme280();
   delay(100);
