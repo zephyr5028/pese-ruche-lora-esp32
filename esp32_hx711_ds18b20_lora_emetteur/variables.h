@@ -19,7 +19,7 @@
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
-//#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
+#define RUCHE_NUMERO  06      // numero de la ruche jlm5 autonome
 //#define RUCHE_NUMERO  07      // numero de la ruche jlm7
 //#define RUCHE_NUMERO  8       // numero de la ruche jlm8 autonome si 08, le 0 defini un nombre octal et 08 octal n'est pas correct
 
@@ -35,7 +35,7 @@
 //#define RUCHE_NUMERO  21      // numero de la ruche loic21
 //#define RUCHE_NUMERO  22      // numero de la ruche loic22
 //#define RUCHE_NUMERO  23      // numero de la ruche loic23
-#define RUCHE_NUMERO 24      // numero de la ruche loic24 autonome
+//#define RUCHE_NUMERO 24      // numero de la ruche loic24 autonome
 
 
 //=======
@@ -81,7 +81,7 @@ float calibration_factor = -21450;       // calibration factor    -21450
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm6 rfm95 autonome
-float calibration_factor = -20000;       // calibration factor    -20000
+float calibration_factor = 19200;       // calibration factor    19200
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
@@ -168,7 +168,7 @@ const long LOADCELL_OFFSET = -159508;        // offset -159508
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm6 rfm95 autonome
-const long LOADCELL_OFFSET = -78000;        // offset -78000
+const long LOADCELL_OFFSET = 100527;        // offset 100527
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
@@ -430,9 +430,9 @@ const int tensionElevee = 7;          // tension elevee
 // batterie 5v autonome
 int R1 = 27000;                       // resistance r1 du pont
 int R2 = 10000;                       // resistance r2 du pont
-float correction = -0.35;             // correction
-float offsetCalcule = 0.226;          // offset mesure par voltmetre
-float tensionDiode = 0.80 ;           // tension tpl5110 regulateur diode
+float correction = -0.18;             // correction
+float offsetCalcule = 0.16;          // offset mesure par voltmetre
+float tensionDiode = 0.26 ;           // tension tpl5110 regulateur diode
 const int tensionFaible = 4.7;        // tension faible
 const int tensionElevee = 6;          // tension elevee
 

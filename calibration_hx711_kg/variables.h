@@ -18,21 +18,23 @@
 //#define RUCHE_NUMERO  03      // numero de la ruche jlm3
 //#define RUCHE_NUMERO  04      // numero de la ruche jlm4
 //#define RUCHE_NUMERO  05      // numero de la ruche jlm5 autonome
-//#define RUCHE_NUMERO  06      // numero de la ruche jlm6 autonome
+#define RUCHE_NUMERO  06      // numero de la ruche jlm6 autonome
 //#define RUCHE_NUMERO  07      // numero de la ruche jlm7
+//#define RUCHE_NUMERO  08      // numero de la ruche jlm8 autonome
 
-//#define RUCHE_NUMERO  11      // numero de la ruche loic1
-//#define RUCHE_NUMERO  12      // numero de la ruche loic2
-//#define RUCHE_NUMERO  13      // numero de la ruche loic3
-//#define RUCHE_NUMERO  14      // numero de la ruche loic4
-//#define RUCHE_NUMERO  15      // numero de la ruche loic5
-//#define RUCHE_NUMERO  16      // numero de la ruche loic6
-//#define RUCHE_NUMERO  17      // numero de la ruche loic7
-//#define RUCHE_NUMERO  18      // numero de la ruche loic8
-//#define RUCHE_NUMERO  19      // numero de la ruche loic9
-//#define RUCHE_NUMERO  21      // numero de la ruche loic10
-//#define RUCHE_NUMERO  22      // numero de la ruche loic11
-#define RUCHE_NUMERO  23      // numero de la ruche loic12
+//#define RUCHE_NUMERO  11      // numero de la ruche loic11
+//#define RUCHE_NUMERO  12      // numero de la ruche loic12
+//#define RUCHE_NUMERO  13      // numero de la ruche loic13
+//#define RUCHE_NUMERO  14      // numero de la ruche loic14
+//#define RUCHE_NUMERO  15      // numero de la ruche loic15
+//#define RUCHE_NUMERO  16      // numero de la ruche loic16
+//#define RUCHE_NUMERO  17      // numero de la ruche loic17
+//#define RUCHE_NUMERO  18      // numero de la ruche loic18
+//#define RUCHE_NUMERO  19      // numero de la ruche loic19
+//#define RUCHE_NUMERO  21      // numero de la ruche loic21
+//#define RUCHE_NUMERO  22      // numero de la ruche loic22
+//#define RUCHE_NUMERO  23      // numero de la ruche loic23
+//#define RUCHE_NUMERO  23      // numero de la ruche loic24 autonome
 
 
 //=====================
@@ -70,59 +72,67 @@ float calibration_factor = -21450;       // calibration factor    -21450
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm6 rfm95 autonome
-float calibration_factor = -20000;       // calibration factor    -20000
+float calibration_factor = 19200;       // calibration factor    19200
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
 float calibration_factor = -21800;       // calibration factor    -21800
 
+#elif RUCHE_NUMERO == 08
+// pour ruche jlm8 rfm95 autonome
+float calibration_factor = -20000;       // calibration factor    -20000
+
 
 #elif RUCHE_NUMERO == 11
-// pour ruche loic1 rfm95
+// pour ruche loic11 rfm95
 float calibration_factor = -20100;       // calibration factor   -20100
 
 #elif RUCHE_NUMERO == 12
-// pour ruche loic2 rfm95
+// pour ruche loic12 rfm95
 float calibration_factor = -22100;       // calibration factor   -22100
 
 #elif RUCHE_NUMERO == 13
-// pour ruche loic3 rfm95
+// pour ruche loic13 rfm95
 float calibration_factor = -20800;       // calibration factor   -20800
 
 #elif RUCHE_NUMERO == 14
-// pour ruche loic4 rfm95
+// pour ruche loic14 rfm95
 float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 15
-// pour ruche loic5 rfm95
+// pour ruche loic15 rfm95
 float calibration_factor = -20400;       // calibration factor   -20400
 
 #elif RUCHE_NUMERO == 16
-// pour ruche loic6 rfm95
+// pour ruche loic16 rfm95
 float calibration_factor = -22900;       // calibration factor   -22900
 
 #elif RUCHE_NUMERO == 17
-// pour ruche loic7 rfm95
+// pour ruche loic17 rfm95
 float calibration_factor = -19800;       // calibration factor   -19800
 
 #elif RUCHE_NUMERO == 18
-// pour ruche loic8 rfm95
+// pour ruche loic18 rfm95
 float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 19
-// pour ruche loic9 rfm95
+// pour ruche loic19 rfm95
 float calibration_factor = -20500;       // calibration factor   -20500
 
 #elif RUCHE_NUMERO == 21
-// pour ruche loic10 rfm95
+// pour ruche loic21 rfm95
 float calibration_factor = -21300;       // calibration factor   -21300
 
 #elif RUCHE_NUMERO == 22
-// pour ruche loic11 rfm95
+// pour ruche loic22 rfm95
 float calibration_factor = -17800;       // calibration factor   -17800
 
 #elif RUCHE_NUMERO == 23
-// pour ruche loic12 rfm95
+// pour ruche loic23 rfm95
+float calibration_factor = -18400;       // calibration factor   -18400
+
+#elif RUCHE_NUMERO == 24
+// pour ruche loic24 rfm95
 float calibration_factor = -18400;       // calibration factor   -18400
 #endif
 
@@ -149,58 +159,66 @@ long LOADCELL_OFFSET = -159508;       // offset -159508
 
 #elif RUCHE_NUMERO == 06
 // pour ruche jlm6 rfm95 autonome
-long LOADCELL_OFFSET = -150000;       // offset -150000
+long LOADCELL_OFFSET = 100527;       // offset 100527
 
 #elif RUCHE_NUMERO == 07
 // pour ruche jlm7 rfm95
 long LOADCELL_OFFSET = -40572;       // offset -40572
 
+#elif RUCHE_NUMERO == 08
+// pour ruche jlm8 rfm95 autonome
+long LOADCELL_OFFSET = -150000;       // offset -150000
+
 #elif RUCHE_NUMERO == 11
-// pour ruche loic1 rfm95
+// pour ruche loic11 rfm95
 long LOADCELL_OFFSET = -22680;      // offset   -22680
 
 #elif RUCHE_NUMERO == 12
-// pour ruche loic2 rfm95
+// pour ruche loic12 rfm95
 long LOADCELL_OFFSET = -125750;     // offset   -125750
 
 #elif RUCHE_NUMERO == 13
-// pour ruche loic3 rfm95
+// pour ruche loic13 rfm95
 long LOADCELL_OFFSET = -82700;      // offset   -82700
 
 #elif RUCHE_NUMERO == 14
-// pour ruche loic4 rfm95
+// pour ruche loic14 rfm95
 long LOADCELL_OFFSET = -95850;      // offset   -95650
 
 #elif RUCHE_NUMERO == 15
-// pour ruche loic5 rfm95
+// pour ruche loic15 rfm95
 long LOADCELL_OFFSET = -139000;     // offset   -139000
 
 #elif RUCHE_NUMERO == 16
-// pour ruche loic6 rfm95
+// pour ruche loic16 rfm95
 long LOADCELL_OFFSET = -102500;     // offset   -102500
 
 #elif RUCHE_NUMERO == 17
-// pour ruche loic7 rfm95
+// pour ruche loic17 rfm95
 long LOADCELL_OFFSET = -86750;      // offset   -86750
 
 #elif RUCHE_NUMERO == 18
-// pour ruche loic8 rfm95
+// pour ruche loic18 rfm95
 long LOADCELL_OFFSET = -78300;      // offset   -78300
 
 #elif RUCHE_NUMERO == 19
-// pour ruche loic9 rfm95
+// pour ruche loic19 rfm95
 long LOADCELL_OFFSET = -95850;      // offset   -95850
 
 #elif RUCHE_NUMERO == 21
-// pour ruche loic10 rfm95
+// pour ruche loic21 rfm95
 long LOADCELL_OFFSET = -183385;      // offset   -183385
 
 #elif RUCHE_NUMERO == 22
-// pour ruche loic11 rfm95
+// pour ruche loic22 rfm95
 long LOADCELL_OFFSET = -160615;      // offset   -160615
 
 #elif RUCHE_NUMERO == 23
-// pour ruche loic12 rfm95
+// pour ruche loic23 rfm95
+long LOADCELL_OFFSET = -117222;      // offset   -117222
+
+#elif RUCHE_NUMERO == 24
+// pour ruche loic24 rfm95
 long LOADCELL_OFFSET = -117222;      // offset   -117222
 #endif
 
@@ -277,7 +295,7 @@ float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans 
 int R1 = 27000;                      // resistance r1 du pont
 int R2 = 10000;                      // resistance r2 du pont
 float correction = -0.18;            // correction resistances - mesure en drv sans le tpl5110
-float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+float tensionDiode = 0.26;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
 
 #elif RUCHE_NUMERO == 07
 // batterie 12v
@@ -286,6 +304,14 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -0.55;             // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
+#elif RUCHE_NUMERO == 08
+// batterie 5v autonome
+float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
+int R1 = 27000;                      // resistance r1 du pont
+int R2 = 10000;                      // resistance r2 du pont
+float correction = -0.18;            // correction resistances - mesure en drv sans le tpl5110
+float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
 
 
 #elif RUCHE_NUMERO == 11
@@ -383,4 +409,13 @@ int R2 = 22000;                       // resistance r2 du pont
 float correction = -2.05 ;            // correction
 float offsetCalcule = 0.226;          // offset mesure par voltmetre
 float tensionDiode = 0.74 ;           // tension de la diode de protection invertion 1n4007
+
+#elif RUCHE_NUMERO == 24
+// batterie 5v autonome
+float offsetCalcule = 0.16;          // offset mesure par voltmetre gpio35 sans le tpl5110
+int R1 = 27000;                      // resistance r1 du pont
+int R2 = 10000;                      // resistance r2 du pont
+float correction = -0.18;            // correction resistances - mesure en drv sans le tpl5110
+float tensionDiode = 0.21;           // tension tpl5110 regulateur diode - en reliant vdd et drv sans le tpl5110
+
 #endif
