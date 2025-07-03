@@ -1121,11 +1121,27 @@ void loop() {
           nomModule = "Capteur_Ruche6_poids";
           // convert string to float
           float poids = atof(BoitierCapteurs.poids.c_str());
+          Serial.print("poids  :  ");
+          Serial.println(poids);
           // pour eliminer les valeurs sans decimales
-          if (poids > (int)poids) {
+          //if (poids > (int)poids) {
+
+            // courbe de correction en fonction de la temperature , sonde placee dans la cellule de charge
+            // calcul de y = px + d avec p = 0,02 coeff directeur et 0,4 origine de la droite, y axe de la temperature de la cellule et x axe du poids releve
+            float tempe = atof(BoitierCapteurs.tempeDS18B20.c_str());
+            float y = (tempe * 0.02) + 0.4; 
+            float poidsReel =  poids - (poids * (y - 1)) ;
+            BoitierCapteurs.poids = String(poidsReel);
+            Serial.print("temperature  :  ");
+            Serial.println(tempe);
+            Serial.print("axe y  :  ");
+            Serial.println(y);
+            Serial.print("poids reel  :  ");
+            Serial.println(poidsReel);
+            
             SendData(idxDeviceCapteurRuche6Poids, nomModule, BoitierCapteurs.poids.c_str(), 0);  // Envoi des donnees via JSON et MQTT
-            essaimage(poids);
-          }
+            essaimage(poidsReel);
+          //}
           // envoi de la temperature du ds18b20
           nomModule = "Capteur_Ruche6_temperature_ds18b20";
           SendData(idxDeviceCapteurRuche6TemperatureDS18B20, nomModule, BoitierCapteurs.tempeDS18B20.c_str(), 0);  // Envoi des données via JSON et MQTT
